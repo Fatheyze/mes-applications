@@ -2,60 +2,66 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Les applications de Monsieur Zeghoudi</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Nunito:wght@600;700;800&display=swap">
 <style>
-:root{--bg:#f6f7fb;--line:#cfd8ee;--margin:#f0a3a3;--ink:#1d2433;--soft:#5b6578;--card:#fff;--accent:#2f4bd6;--on-accent:#fff}
-@media (prefers-color-scheme:dark){:root{--bg:#171b27;--line:#273049;--margin:#6b3a46;--ink:#eef1f8;--soft:#a2abc0;--card:#222a3d;--accent:#8ea2ff;--on-accent:#10152a}}
+:root{color-scheme:dark;--bg:#1a0f3d;--panel:#261552;--edge:#3d2b80;--input:#140a30;--ink:#fff;--soft:#b9b0e6;--yellow:#f7c948;--pink:#e0559a;--blue:#5b87f5;--green:#4fc58b;--orange:#f08a3c;--dark:#2a1860}
 *{box-sizing:border-box}
 html,body{margin:0}
-body{font-family:"Bricolage Grotesque",system-ui,sans-serif;color:var(--ink);background-color:var(--bg);
- background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
- background-size:32px 32px;min-height:100vh}
-.wrap{max-width:1040px;margin:0 auto;padding:40px 24px 64px 56px;position:relative}
-.wrap::before{content:"";position:absolute;left:32px;top:0;bottom:0;width:2px;background:var(--margin)}
-header{display:flex;flex-wrap:wrap;gap:16px;align-items:end;justify-content:space-between;margin-bottom:28px}
-h1{font-size:clamp(1.8rem,4vw,2.75rem);max-width:640px;font-weight:800;letter-spacing:-.03em;margin:0;line-height:1}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{font-family:"Nunito",system-ui,sans-serif;font-weight:700;color:var(--ink);min-height:100vh;overflow-x:hidden;
+ background:radial-gradient(900px 600px at 85% -10%,#3b1f86 0%,transparent 60%),radial-gradient(700px 500px at 0% 100%,#2d1470 0%,transparent 60%),var(--bg)}
+.sym{position:fixed;inset:0;pointer-events:none;z-index:0}
+.sym span{position:absolute;font-family:"Lilita One",sans-serif;color:#fff;opacity:.07;line-height:1}
+.wrap{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:36px 24px 64px}
+header{display:flex;flex-wrap:wrap;gap:20px;align-items:center;justify-content:space-between;margin-bottom:30px}
+.brand{display:flex;align-items:center;gap:16px}
+.logo{width:64px;height:64px;border-radius:50%;background:var(--yellow);color:var(--dark);display:grid;place-items:center;font-family:"Lilita One",sans-serif;font-size:2rem;box-shadow:0 6px 0 #c99a1c;flex:none}
+h1{font-family:"Lilita One","Nunito",sans-serif;font-weight:400;font-size:clamp(1.7rem,4vw,2.6rem);line-height:1.05;margin:0;color:var(--yellow);max-width:560px;letter-spacing:.01em}
 .tools{display:flex;gap:10px;flex-wrap:wrap}
-input,button,select{font:inherit}
-.search{padding:10px 14px;border:2px solid var(--ink);border-radius:10px;background:var(--card);color:var(--ink);min-width:200px}
-.btn{padding:10px 16px;border:2px solid var(--ink);border-radius:10px;background:var(--card);color:var(--ink);cursor:pointer;font-weight:600}
-.btn.primary{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
-.btn:hover{transform:translateY(-1px)}
-:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:22px}
-.tile{position:relative;background:var(--card);border:2px solid var(--ink);border-radius:14px;overflow:hidden;box-shadow:5px 5px 0 var(--ink);transition:transform .15s,box-shadow .15s}
-.tile:hover{transform:translate(-2px,-2px);box-shadow:7px 7px 0 var(--ink)}
+input,button{font:inherit}
+.search{padding:12px 18px;border:2px solid var(--edge);border-radius:999px;background:var(--input);color:var(--ink);min-width:210px;font-weight:700}
+.search::placeholder,dialog input::placeholder{color:#7e73b8}
+.btn{padding:12px 20px;border:2px solid var(--edge);border-radius:999px;background:var(--panel);color:var(--ink);cursor:pointer;font-weight:800;transition:transform .12s}
+.btn.primary{background:var(--pink);border-color:var(--pink);box-shadow:0 5px 0 #a83b73}
+.btn:hover{transform:translateY(-2px)}
+:focus-visible{outline:3px solid var(--yellow);outline-offset:3px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:26px}
+.tile{--c:var(--pink);position:relative;background:#fff;border:5px solid var(--c);border-radius:24px;overflow:hidden;box-shadow:0 8px 0 rgba(0,0,0,.28);transition:transform .15s}
+.tile:nth-child(4n+1){--c:var(--pink)}.tile:nth-child(4n+2){--c:var(--blue)}.tile:nth-child(4n+3){--c:var(--green)}.tile:nth-child(4n+4){--c:var(--orange)}
+.tile:hover{transform:translateY(-4px) rotate(-.6deg)}
 .tile a{display:block;color:inherit;text-decoration:none}
-.thumb{aspect-ratio:16/10;display:grid;place-items:center;font-size:3.4rem;background-size:cover;background-position:center;border-bottom:2px solid var(--ink)}
-.thumb{position:relative;overflow:hidden}
+.thumb{position:relative;overflow:hidden;aspect-ratio:16/10;display:grid;place-items:center;font-size:3.4rem;background-size:cover;background-position:center;border-bottom:4px solid var(--c)}
 .thumb span{position:absolute;inset:0;display:grid;place-items:center}
 .thumb iframe{position:absolute;top:0;left:0;width:1280px;height:800px;border:0;transform-origin:0 0;pointer-events:none;background:#fff}
-.name{padding:12px 14px 14px;font-weight:600;font-size:1.05rem}
+.name{padding:14px 16px 16px;font-family:"Lilita One","Nunito",sans-serif;font-weight:400;font-size:1.2rem;color:var(--dark);text-align:center}
 .edit-bar{position:absolute;top:8px;right:8px;display:none;gap:6px}
 .editing .edit-bar{display:flex}
 .editing .tile a{pointer-events:none}
-.mini{width:34px;height:34px;border:2px solid var(--ink);border-radius:8px;background:var(--card);color:var(--ink);cursor:pointer}
-.empty{border:2px dashed var(--ink);border-radius:14px;padding:40px 24px;background:var(--card);max-width:520px}
-.empty h2{margin:0 0 8px}
+.mini{width:36px;height:36px;border:2px solid var(--dark);border-radius:50%;background:#fff;color:var(--dark);cursor:pointer;font-weight:800}
+.empty{border:3px dashed var(--edge);border-radius:24px;padding:40px 24px;background:var(--panel);max-width:520px}
+.empty h2{margin:0 0 8px;font-family:"Lilita One",sans-serif;font-weight:400;color:var(--yellow)}
 .empty p{color:var(--soft);margin:0 0 18px}
-dialog{border:2px solid var(--ink);border-radius:14px;background:var(--card);color:var(--ink);padding:24px;width:min(440px,92vw)}
-dialog::backdrop{background:rgba(10,14,26,.55)}
-label{display:block;font-weight:600;margin:14px 0 6px}
-dialog input[type=text],dialog input[type=url]{width:100%;padding:10px 12px;border:2px solid var(--ink);border-radius:10px;background:var(--bg);color:var(--ink)}
-small{color:var(--soft);display:block;margin-top:4px}
+dialog{border:2px solid var(--edge);border-radius:24px;background:var(--panel);color:var(--ink);padding:26px;width:min(450px,92vw)}
+dialog::backdrop{background:rgba(10,5,30,.7)}
+dialog h2{font-family:"Lilita One",sans-serif;font-weight:400;color:var(--yellow);font-size:1.7rem}
+label{display:block;font-weight:800;margin:16px 0 6px}
+dialog input[type=text]{width:100%;padding:12px 16px;border:2px solid var(--edge);border-radius:999px;background:var(--input);color:var(--ink)}
+dialog input[type=file]{color:var(--soft);max-width:100%}
+small{color:var(--soft);display:block;margin-top:6px;font-weight:600}
 .row{display:flex;gap:12px;align-items:center}
-.row input[type=color]{width:52px;height:42px;border:2px solid var(--ink);border-radius:10px;padding:2px;background:var(--bg)}
-.actions{display:flex;justify-content:flex-end;gap:10px;margin-top:22px}
-.note{color:var(--soft);margin-top:28px;font-size:.92rem}
+.row input[type=color]{width:54px;height:44px;border:2px solid var(--edge);border-radius:999px;padding:2px;background:var(--input)}
+.actions{display:flex;justify-content:flex-end;gap:10px;margin-top:24px}
+.note{color:var(--soft);margin-top:34px;font-size:.92rem;font-weight:600}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
 <body>
+<div class="sym" aria-hidden="true"><span style="left:4%;top:14%;font-size:90px;transform:rotate(-12deg)">π</span><span style="right:6%;top:8%;font-size:120px;transform:rotate(10deg)">%</span><span style="left:46%;top:46%;font-size:110px;transform:rotate(8deg)">Σ</span><span style="right:4%;top:55%;font-size:90px;transform:rotate(-8deg)">÷</span><span style="left:8%;bottom:8%;font-size:130px;transform:rotate(14deg)">∫</span><span style="right:22%;bottom:6%;font-size:100px;transform:rotate(-14deg)">√</span></div>
 <div class="wrap" id="app">
   <header>
-    <h1>Les applications de Monsieur Zeghoudi</h1>
+    <div class="brand"><div class="logo" aria-hidden="true">π</div><h1>Les applications de Monsieur Zeghoudi</h1></div>
     <div class="tools">
       <input class="search" id="q" type="search" placeholder="Rechercher…" aria-label="Rechercher une application">
       <button class="btn primary" id="add">Ajouter une application</button>
