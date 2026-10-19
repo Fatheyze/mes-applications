@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Les applications de Monsieur Zeghoudi</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;800&display=swap">
+<style>
+:root{--bg:#f6f7fb;--line:#cfd8ee;--margin:#f0a3a3;--ink:#1d2433;--soft:#5b6578;--card:#fff;--accent:#2f4bd6;--on-accent:#fff}
+@media (prefers-color-scheme:dark){:root{--bg:#171b27;--line:#273049;--margin:#6b3a46;--ink:#eef1f8;--soft:#a2abc0;--card:#222a3d;--accent:#8ea2ff;--on-accent:#10152a}}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font-family:"Bricolage Grotesque",system-ui,sans-serif;color:var(--ink);background-color:var(--bg);
+ background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
+ background-size:32px 32px;min-height:100vh}
+.wrap{max-width:1040px;margin:0 auto;padding:40px 24px 64px 56px;position:relative}
+.wrap::before{content:"";position:absolute;left:32px;top:0;bottom:0;width:2px;background:var(--margin)}
+header{display:flex;flex-wrap:wrap;gap:16px;align-items:end;justify-content:space-between;margin-bottom:28px}
+h1{font-size:clamp(1.8rem,4vw,2.75rem);max-width:640px;font-weight:800;letter-spacing:-.03em;margin:0;line-height:1}
+.tools{display:flex;gap:10px;flex-wrap:wrap}
+input,button,select{font:inherit}
+.search{padding:10px 14px;border:2px solid var(--ink);border-radius:10px;background:var(--card);color:var(--ink);min-width:200px}
+.btn{padding:10px 16px;border:2px solid var(--ink);border-radius:10px;background:var(--card);color:var(--ink);cursor:pointer;font-weight:600}
+.btn.primary{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.btn:hover{transform:translateY(-1px)}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:22px}
+.tile{position:relative;background:var(--card);border:2px solid var(--ink);border-radius:14px;overflow:hidden;box-shadow:5px 5px 0 var(--ink);transition:transform .15s,box-shadow .15s}
+.tile:hover{transform:translate(-2px,-2px);box-shadow:7px 7px 0 var(--ink)}
+.tile a{display:block;color:inherit;text-decoration:none}
+.thumb{aspect-ratio:16/10;display:grid;place-items:center;font-size:3.4rem;background-size:cover;background-position:center;border-bottom:2px solid var(--ink)}
+.thumb{position:relative;overflow:hidden}
+.thumb span{position:absolute;inset:0;display:grid;place-items:center}
+.thumb iframe{position:absolute;top:0;left:0;width:1280px;height:800px;border:0;transform-origin:0 0;pointer-events:none;background:#fff}
+.name{padding:12px 14px 14px;font-weight:600;font-size:1.05rem}
+.edit-bar{position:absolute;top:8px;right:8px;display:none;gap:6px}
+.editing .edit-bar{display:flex}
+.editing .tile a{pointer-events:none}
+.mini{width:34px;height:34px;border:2px solid var(--ink);border-radius:8px;background:var(--card);color:var(--ink);cursor:pointer}
+.empty{border:2px dashed var(--ink);border-radius:14px;padding:40px 24px;background:var(--card);max-width:520px}
+.empty h2{margin:0 0 8px}
+.empty p{color:var(--soft);margin:0 0 18px}
+dialog{border:2px solid var(--ink);border-radius:14px;background:var(--card);color:var(--ink);padding:24px;width:min(440px,92vw)}
+dialog::backdrop{background:rgba(10,14,26,.55)}
+label{display:block;font-weight:600;margin:14px 0 6px}
+dialog input[type=text],dialog input[type=url]{width:100%;padding:10px 12px;border:2px solid var(--ink);border-radius:10px;background:var(--bg);color:var(--ink)}
+small{color:var(--soft);display:block;margin-top:4px}
+.row{display:flex;gap:12px;align-items:center}
+.row input[type=color]{width:52px;height:42px;border:2px solid var(--ink);border-radius:10px;padding:2px;background:var(--bg)}
+.actions{display:flex;justify-content:flex-end;gap:10px;margin-top:22px}
+.note{color:var(--soft);margin-top:28px;font-size:.92rem}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap" id="app">
+  <header>
+    <h1>Les applications de Monsieur Zeghoudi</h1>
+    <div class="tools">
+      <input class="search" id="q" type="search" placeholder="Rechercher…" aria-label="Rechercher une application">
+      <button class="btn primary" id="add">Ajouter une application</button>
+      <button class="btn" id="toggle" aria-pressed="false">Modifier</button>
+    </div>
+  </header>
+  <main class="grid" id="grid"></main>
+  <p class="note" id="note"></p>
+</div>
+
+<dialog id="dlg">
+  <form method="dialog" id="form">
+    <h2 id="dlgTitle" style="margin:0">Nouvelle application</h2>
+    <label for="fName">Nom</label>
+    <input type="text" id="fName" required maxlength="60">
+    <label for="fUrl">Fichier ou adresse</label>
+    <input type="text" id="fUrl" required placeholder="ma-page.html">
+    <small>Si ce fichier est dans le même dossier que cette page, écrivez simplement son nom.</small>
+    <label for="fEmoji">Icône (un emoji)</label>
+    <div class="row"><input type="text" id="fEmoji" maxlength="4" style="width:90px" placeholder="📚"><input type="color" id="fColor" value="#ffd966" aria-label="Couleur de fond"></div>
+    <label for="fImg">Miniature (capture d’écran, facultatif)</label>
+    <input type="file" id="fImg" accept="image/*">
+    <div class="actions">
+      <button class="btn" type="button" id="cancel">Annuler</button>
+      <button class="btn primary" type="submit" id="save">Enregistrer</button>
+    </div>
+  </form>
+</dialog>
+
+<script>
+(function(){
+  var KEY="mes-applications-v1", apps=[], editId=null, imgData=null, editing=false;
+  var grid=document.getElementById("grid"), q=document.getElementById("q"), dlg=document.getElementById("dlg");
+  var B="https://fatheyze.github.io/";
+  var SEED=[
+    ["roue-maths","Roue des maths","🎡","#ffd966"],
+    ["interro-flash","Interro flash","⚡","#ffb4a2"],
+    ["maths-expedition","Maths expédition","🧭","#a8dadc"],
+    ["memo-brevet","Mémo brevet","📝","#cdb4db"],
+    ["qrcodes","QR codes","🔳","#b5e48c"],
+    ["suivi-numerique","Suivi numérique","📊","#9bc4ff"],
+    ["rcd","RCD","🎲","#ffc8dd"],
+    ["automatismes-maths","Automatismes maths","🧮","#fde4a1"]
+  ].map(function(s){return {id:s[0],name:s[1],url:B+s[0]+"/",emoji:s[2],color:s[3],img:null}});
+  function load(){
+    var raw=null;
+    try{raw=localStorage.getItem(KEY)}catch(e){}
+    if(raw===null){apps=SEED;return}
+    try{apps=JSON.parse(raw)}catch(e){apps=SEED}
+  }
+  function persist(){try{localStorage.setItem(KEY,JSON.stringify(apps))}catch(e){alert("Impossible d’enregistrer : la miniature est peut-être trop lourde.")}}
+  function esc(s){var d=document.createElement("div");d.textContent=s;return d.innerHTML}
+  function render(){
+    var term=q.value.trim().toLowerCase();
+    var list=apps.filter(function(a){return a.name.toLowerCase().indexOf(term)>-1});
+    document.getElementById("app").classList.toggle("editing",editing);
+    if(!apps.length){
+      grid.innerHTML='<div class="empty"><h2>Aucune application pour l’instant</h2><p>Ajoutez vos pages HTML : chacune devient une miniature sur laquelle cliquer.</p><button class="btn primary" id="first">Ajouter ma première application</button></div>';
+      document.getElementById("first").onclick=function(){openDlg()};
+      document.getElementById("note").textContent="";return;
+    }
+    grid.innerHTML=list.map(function(a){
+      var style=a.img?'background-image:url('+a.img+')':'background:'+a.color;
+      return '<div class="tile"><a href="'+esc(a.url)+'" target="_blank" rel="noopener"><div class="thumb" style="'+style+'">'+(a.img?'':'<span>'+esc(a.emoji||"📄")+'</span><iframe src="'+esc(a.url)+'" loading="lazy" tabindex="-1" title="Aperçu de '+esc(a.name)+'" sandbox="allow-scripts allow-same-origin"></iframe>')+'</div><div class="name">'+esc(a.name)+'</div></a>'+
+        '<div class="edit-bar"><button class="mini" data-e="'+a.id+'" aria-label="Modifier '+esc(a.name)+'">✎</button><button class="mini" data-d="'+a.id+'" aria-label="Supprimer '+esc(a.name)+'">✕</button></div></div>';
+    }).join("")||'<p>Aucun résultat.</p>';
+    document.getElementById("note").textContent="Aperçus en direct de vos pages. Vos réglages sont enregistrés dans ce navigateur.";
+    fit();
+  }
+  function fit(){
+    var ts=grid.querySelectorAll(".thumb");
+    for(var i=0;i<ts.length;i++){
+      var f=ts[i].querySelector("iframe");
+      if(f)f.style.transform="scale("+(ts[i].clientWidth/1280)+")";
+    }
+  }
+  window.addEventListener("resize",fit);
+  function openDlg(a){
+    editId=a?a.id:null; imgData=a&&a.img?a.img:null;
+    document.getElementById("dlgTitle").textContent=a?"Modifier l’application":"Nouvelle application";
+    document.getElementById("fName").value=a?a.name:"";
+    document.getElementById("fUrl").value=a?a.url:"";
+    document.getElementById("fEmoji").value=a?a.emoji:"";
+    document.getElementById("fColor").value=a?a.color:"#ffd966";
+    document.getElementById("fImg").value="";
+    dlg.showModal();
+  }
+  document.getElementById("add").onclick=function(){openDlg()};
+  document.getElementById("cancel").onclick=function(){dlg.close()};
+  document.getElementById("toggle").onclick=function(e){editing=!editing;e.target.textContent=editing?"Terminer":"Modifier";e.target.setAttribute("aria-pressed",editing);render()};
+  q.oninput=render;
+  grid.onclick=function(e){
+    var b=e.target.closest("button");if(!b)return;
+    if(b.dataset.e)openDlg(apps.filter(function(a){return a.id===b.dataset.e})[0]);
+    if(b.dataset.d&&confirm("Supprimer cette application de la page ?")){apps=apps.filter(function(a){return a.id!==b.dataset.d});persist();render()}
+  };
+  document.getElementById("fImg").onchange=function(e){
+    var f=e.target.files[0];if(!f)return;
+    var r=new FileReader();
+    r.onload=function(){var im=new Image();im.onload=function(){
+      var w=480,h=Math.round(im.height*w/im.width),c=document.createElement("canvas");c.width=w;c.height=h;
+      c.getContext("2d").drawImage(im,0,0,w,h);imgData=c.toDataURL("image/jpeg",.8)};im.src=r.result};
+    r.readAsDataURL(f);
+  };
+  document.getElementById("form").onsubmit=function(){
+    var o={id:editId||String(Date.now()),name:document.getElementById("fName").value.trim(),url:document.getElementById("fUrl").value.trim(),
+      emoji:document.getElementById("fEmoji").value.trim(),color:document.getElementById("fColor").value,img:imgData};
+    if(editId)apps=apps.map(function(a){return a.id===editId?o:a});else apps.push(o);
+    persist();render();
+  };
+  load();render();
+})();
+</script>
+</body>
+</html>
