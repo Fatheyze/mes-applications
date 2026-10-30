@@ -1,0 +1,1661 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Générateur d'appréciations</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#1a1036; --bg2:#21134a; --card:#2a1a58; --card2:#33216a; --line:#4b3792;
+  --txt:#f4f0ff; --mut:#b9acdd; --jaune:#f5c84c; --rose:#d65a9c; --bleu:#6b8cff;
+  --vert:#5cc28a; --orange:#f0954a; --rouge:#ff6b7a;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:radial-gradient(1100px 600px at 100% 0,#33207a 0,transparent 60%),var(--bg);color:var(--txt);font-family:Nunito,system-ui,sans-serif;min-height:100vh;font-size:15px}
+button,input,select,textarea{font-family:inherit;font-size:inherit;color:inherit}
+.wrap{max-width:1280px;margin:0 auto;padding:24px 16px 60px}
+header{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.logo{width:64px;height:64px;border-radius:50%;background:var(--jaune);color:var(--bg);display:grid;place-items:center;font:36px "Lilita One";box-shadow:0 6px 0 #b8902a;flex:none}
+h1{font:clamp(26px,4vw,42px)/1.05 "Lilita One";color:var(--jaune);margin:0;flex:1;min-width:220px}
+.top-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+select,input[type=text],input[type=number],input:not([type]),textarea{background:var(--bg2);border:2px solid var(--line);border-radius:12px;padding:8px 12px;outline:none}
+select:focus,input:focus,textarea:focus{border-color:var(--bleu)}
+.btn{background:var(--card2);border:2px solid var(--line);border-radius:999px;padding:9px 18px;font-weight:800;cursor:pointer;white-space:nowrap}
+.btn:hover{border-color:var(--bleu)}
+.btn.rose{background:var(--rose);border-color:var(--rose);box-shadow:0 4px 0 #9c3a6f}
+.btn.jaune{background:var(--jaune);border-color:var(--jaune);color:var(--bg);box-shadow:0 4px 0 #b8902a}
+.btn.danger{border-color:var(--rouge);color:var(--rouge)}
+.btn.small{padding:6px 12px;font-size:13px}
+.btn:disabled{opacity:.5;cursor:default}
+nav.tabs{display:flex;gap:8px;margin:22px 0 18px;flex-wrap:wrap}
+nav.tabs button{background:transparent;border:2px solid var(--line);color:var(--mut);border-radius:14px;padding:10px 18px;font:18px "Lilita One";cursor:pointer}
+nav.tabs button.on{background:var(--card2);color:var(--jaune);border-color:var(--jaune)}
+.tab{display:none}.tab.on{display:block}
+.card{background:var(--card);border:2px solid var(--line);border-radius:20px;padding:18px}
+.muted{color:var(--mut)}
+.eleves-wrap{display:grid;grid-template-columns:300px 1fr;gap:18px;align-items:start}
+@media (max-width:880px){.eleves-wrap{grid-template-columns:1fr}}
+aside.card{padding:14px;position:sticky;top:12px}
+@media (max-width:880px){aside.card{position:static}}
+#filtre{width:100%}
+.prog{font-size:13px;color:var(--mut);margin:10px 2px 4px}
+.bar{height:8px;background:var(--bg2);border-radius:99px;overflow:hidden}
+.bar span{display:block;height:100%;background:var(--vert);transition:width .3s}
+#items{max-height:60vh;overflow:auto;margin:10px -4px;padding:0 4px}
+@media (max-width:880px){#items{max-height:260px}}
+.item{display:flex;align-items:center;gap:8px;width:100%;text-align:left;background:transparent;border:2px solid transparent;border-radius:12px;padding:7px 8px;cursor:pointer}
+.item:hover{background:var(--bg2)}
+.item.sel{border-color:var(--jaune);background:var(--bg2)}
+.item .nm{flex:1;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--line);flex:none}
+.dot.mid{background:var(--orange)}.dot.ok{background:var(--vert)}
+.moy{font-weight:800;font-size:13px;padding:2px 8px;border-radius:8px;flex:none;white-space:nowrap}
+.c0{background:#3a2b6e;color:var(--mut)}.c1{background:#ff6b7a33;color:#ff9aa5}.c2{background:#f0954a33;color:#ffb57a}
+.c3{background:#f5c84c33;color:#ffd96e}.c4{background:#a6d96a33;color:#c3ec8c}.c5{background:#5cc28a33;color:#7fe3a9}
+.liste-actions{display:flex;gap:8px;flex-wrap:wrap}
+.ed-head{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;justify-content:space-between}
+.ident{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.ident input{font:22px "Lilita One";width:200px;max-width:100%}
+.ident input.pre{width:170px}
+.seg{display:inline-flex;border:2px solid var(--line);border-radius:999px;overflow:hidden}
+.seg button{background:transparent;border:0;padding:7px 14px;font-weight:800;cursor:pointer;color:var(--mut)}
+.seg button.on{background:var(--bleu);color:#fff}
+.guess{font-size:12px;color:var(--orange);margin-left:4px}
+.chiffres{display:flex;gap:10px;flex-wrap:wrap}
+.chiffres label{display:flex;flex-direction:column;font-size:12px;color:var(--mut);font-weight:700;gap:4px}
+.chiffres input{width:90px}
+.chiffres label.wide input{width:240px;max-width:100%}
+.badges{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 4px}
+.badge{font-size:13px;font-weight:800;padding:4px 10px;border-radius:999px;background:var(--bg2);border:1.5px solid var(--line)}
+.notes{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px;align-items:center}
+.note{font-size:12px;font-weight:800;padding:2px 7px;border-radius:7px;cursor:default}
+.groupes{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;margin-top:16px}
+@media (max-width:420px){.groupes{grid-template-columns:1fr}}
+.grp{background:var(--bg2);border-radius:16px;padding:12px;min-width:0}
+.grp h4{margin:0 0 8px;font:16px "Lilita One";color:var(--jaune);letter-spacing:.3px}
+.grp h5{margin:8px 0 6px;font-size:12px;color:var(--mut);text-transform:uppercase;letter-spacing:.5px}
+.grp.marge{border:2px dashed var(--line)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1.5px solid var(--line);background:transparent;border-radius:999px;padding:5px 11px;font-weight:700;font-size:13px;cursor:pointer;color:var(--txt)}
+.chip:hover{border-color:var(--mut)}
+.chip.pos{border-color:#5cc28a66}.chip.neg{border-color:#d65a9c66}
+.chip.pos.on{background:var(--vert);border-color:var(--vert);color:#0f2a1c}
+.chip.neg.on{background:var(--rose);border-color:var(--rose);color:#fff}
+.chip.neu.on{background:var(--bleu);border-color:var(--bleu);color:#fff}
+.chip.auto::before{content:"✦ "}
+.chip.auto.on{box-shadow:0 0 0 2px #5cc28a88}
+.chip.auto:not(.on){border-style:dashed;opacity:.75}
+.legende{font-size:12px;color:var(--mut);margin:-2px 0 8px}
+.grp.full{grid-column:1/-1}
+#remarque{width:100%}
+table.mini{width:100%;border-collapse:collapse}
+table.mini th,table.mini td{padding:6px 6px;border-bottom:1.5px solid var(--line);font-size:13px;text-align:left;vertical-align:middle}
+table.mini th{font:13px Nunito;font-weight:800;color:var(--mut)}
+.flag{font-size:12px;font-weight:800;padding:2px 8px;border-radius:999px;white-space:nowrap}
+.flag.f{background:#5cc28a33;color:#7fe3a9}.flag.d{background:#d65a9c33;color:#f39ac8}
+.scroll-x{overflow-x:auto}
+.sortie{margin-top:16px;background:var(--bg2);border:2px solid var(--jaune);border-radius:18px;padding:14px}
+.sortie-top{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap}
+.sortie-top b{font:18px "Lilita One";color:var(--jaune)}
+.count{font-size:13px;font-weight:800;color:var(--mut)}.count.over{color:var(--rouge)}
+.sortie textarea{width:100%;min-height:130px;resize:vertical;line-height:1.5;font-size:16px;background:var(--bg)}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center}
+.actions .sp{flex:1}
+.lock{font-size:12px;font-weight:800;color:var(--orange)}
+.empty{text-align:center;padding:40px 20px}
+.empty h2{font:28px "Lilita One";color:var(--jaune);margin:0 0 10px}
+.empty p{max-width:600px;margin:0 auto 18px;line-height:1.5}
+.empty .top-actions{justify-content:center}
+.kbd{font-size:12px;color:var(--mut);margin-top:8px}
+.recap-row{display:grid;grid-template-columns:220px 1fr auto;gap:14px;padding:12px 0;border-bottom:1.5px solid var(--line);align-items:start}
+.recap-row:last-child{border:0}
+@media (max-width:760px){.recap-row{grid-template-columns:1fr}.recap-act{align-items:flex-start!important;flex-direction:row!important;flex-wrap:wrap}}
+.recap-txt{line-height:1.5}
+.recap-txt.vide{color:var(--mut);font-style:italic}
+.recap-act{display:flex;flex-direction:column;gap:6px;align-items:flex-end}
+.chk{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:var(--mut);cursor:pointer}
+.chk input{width:18px;height:18px;accent-color:var(--vert)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:16px}
+.stat{background:var(--bg2);border-radius:16px;padding:12px;text-align:center}
+.stat b{display:block;font:26px "Lilita One";color:var(--jaune)}
+.stat span{font-size:12px;color:var(--mut);font-weight:700}
+.histo{display:flex;align-items:flex-end;gap:10px;height:150px;padding:10px;background:var(--bg2);border-radius:16px;margin-bottom:16px}
+.histo div{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:4px;font-size:12px;font-weight:800}
+.histo i{display:block;width:100%;border-radius:8px 8px 3px 3px;min-height:3px}
+.histo small{color:var(--mut);font-weight:700}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media (max-width:880px){.two{grid-template-columns:1fr}}
+table{width:100%;border-collapse:collapse}
+th,td{text-align:left;padding:9px 8px;border-bottom:1.5px solid var(--line);font-size:14px;vertical-align:middle}
+th{color:var(--jaune);font:15px "Lilita One";letter-spacing:.3px}
+td select{padding:5px 8px;font-size:13px}
+.auto-lbl{font-size:11px;color:var(--mut)}
+.resume{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.form{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.form label{display:flex;flex-direction:column;gap:6px;font-weight:800;font-size:13px;color:var(--mut)}
+.form small{font-weight:600}
+h3{font:20px "Lilita One";color:var(--jaune);margin:0 0 12px}
+.stack>*+*{margin-top:22px}
+.ev-table input,.ev-table select{padding:5px 8px;border-radius:9px;font-size:13px;width:100%}
+.ev-table input.n{width:64px}
+dialog{background:var(--card);color:var(--txt);border:2px solid var(--jaune);border-radius:22px;padding:0;width:min(1060px,96vw);max-height:92vh}
+dialog::backdrop{background:#0b0620cc}
+.dlg{padding:20px;overflow:auto;max-height:92vh}
+.dlg h2{font:26px "Lilita One";color:var(--jaune);margin:0 0 6px}
+.dlg h3{margin:16px 0 6px}
+.drop{border:2.5px dashed var(--line);border-radius:18px;padding:22px;text-align:center;cursor:pointer;transition:.2s}
+.drop.hover,.drop:hover{border-color:var(--jaune);background:var(--bg2)}
+.drop b{font:20px "Lilita One";color:var(--jaune)}
+.ou{text-align:center;color:var(--mut);font-weight:800;margin:12px 0}
+#imp-txt{width:100%;min-height:90px;font-family:ui-monospace,monospace;font-size:13px}
+.opts{display:flex;gap:16px;flex-wrap:wrap;margin:10px 0;align-items:center;font-size:14px}
+.opts label{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.ocr-status{margin:10px 0;font-weight:700;color:var(--bleu);min-height:20px}
+.prev-wrap{max-height:36vh;overflow:auto;border:2px solid var(--line);border-radius:14px}
+.prev-wrap table td,.prev-wrap table th{padding:5px 6px;font-size:13px}
+.prev-wrap input,.prev-wrap select{padding:4px 6px;border-radius:8px;width:100%;font-size:13px}
+.prev-wrap input.n{width:60px}
+.prev-wrap td.x{width:30px}
+.warn{color:var(--orange);font-weight:800;font-size:12px;white-space:nowrap}
+details{margin-top:8px}
+summary{cursor:pointer;font-weight:800;color:var(--mut)}
+details p,details li{line-height:1.5;font-size:14px}
+#toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(140px);background:var(--jaune);color:var(--bg);font-weight:800;padding:12px 22px;border-radius:999px;transition:.3s;z-index:99;box-shadow:0 6px 20px #0008;max-width:92vw;text-align:center}
+#toast.on{transform:translateX(-50%) translateY(0)}
+.print-title{display:none;font-size:20px;font-weight:800;margin-bottom:10px}
+@media print{
+  body{background:#fff;color:#000}
+  header,nav,.no-print,#toast{display:none!important}
+  .tab{display:none!important}
+  #tab-conseil{display:block!important}
+  .card{border:0;background:#fff;padding:0}
+  th{color:#000}th,td{border-color:#999}
+  td select{border:0;background:#fff;color:#000;appearance:none}
+  .print-title{display:block!important}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="logo">π</div>
+    <h1>Générateur d'appréciations</h1>
+    <div class="top-actions">
+      <select id="sel-classe" aria-label="Classe"></select>
+      <button class="btn" data-act="new-class">＋ Classe</button>
+      <button class="btn rose" data-act="import-open">⬆ Importer les notes</button>
+    </div>
+  </header>
+
+  <nav class="tabs">
+    <button data-act="tab" data-tab="eleves" class="on">✏️ Élèves</button>
+    <button data-act="tab" data-tab="recap">📋 Récap Pronote</button>
+    <button data-act="tab" data-tab="classe">🏫 Appréciation de classe</button>
+    <button data-act="tab" data-tab="conseil">🗂️ Conseil de classe</button>
+    <button data-act="tab" data-tab="reglages">⚙️ Évaluations et réglages</button>
+  </nav>
+
+  <section class="tab on" id="tab-eleves">
+    <div class="eleves-wrap" id="eleves-wrap">
+      <aside class="card">
+        <input id="filtre" placeholder="Rechercher un élève…">
+        <div class="prog" id="prog"></div>
+        <div class="bar"><span id="prog-bar"></span></div>
+        <div id="items"></div>
+        <div class="liste-actions">
+          <button class="btn small" data-act="add-eleve">＋ Élève</button>
+          <button class="btn small" data-act="gen-all">↻ Tout reformuler</button>
+        </div>
+      </aside>
+      <div class="card" id="editeur"></div>
+    </div>
+  </section>
+
+  <section class="tab" id="tab-recap"><div class="card" id="recap"></div></section>
+  <section class="tab" id="tab-classe"><div class="card" id="classe"></div></section>
+  <section class="tab" id="tab-conseil"><div class="card" id="conseil"></div></section>
+  <section class="tab" id="tab-reglages"><div class="card" id="reglages"></div></section>
+</div>
+
+<dialog id="dlg-import">
+  <div class="dlg">
+    <h2>Importer les notes depuis Pronote</h2>
+    <p class="muted" style="margin-top:0">Tout se passe dans votre navigateur : aucune donnée d'élève n'est envoyée sur Internet.</p>
+    <div class="drop" id="drop">
+      <b>📊 Déposez ici le fichier Excel exporté de Pronote</b><br>
+      <span class="muted">(.xlsx, .xls, .ods ou .csv) · ou des captures d'écran du tableau de notes · cliquez pour choisir, ou Ctrl+V pour coller une capture</span>
+      <input type="file" id="imp-file" accept=".xlsx,.xls,.ods,.csv,image/*" multiple hidden>
+    </div>
+    <div class="ocr-status" id="ocr-status"></div>
+    <details>
+      <summary>Ou coller le tableau en texte</summary>
+      <textarea id="imp-txt" placeholder="Collez ici le tableau copié depuis Pronote ou un tableur (une ligne par élève, ligne d'en-tête comprise si possible)."></textarea>
+    </details>
+    <div class="opts">
+      <label>Classe : <select id="imp-classe"></select></label>
+      <label>Si la classe existe déjà : <select id="imp-fusion"><option value="maj">mettre à jour les notes (garde les critères cochés)</option><option value="remplacer">remplacer toute la liste</option></select></label>
+      <label><input type="checkbox" id="imp-recent" checked> Sans dates : devoirs les plus récents à gauche (comme Pronote)</label>
+    </div>
+    <div id="imp-prev"></div>
+    <details>
+      <summary>Comment ça marche ?</summary>
+      <ul>
+        <li><b>Fichier Excel</b> (recommandé) : exportez le tableau des notes de la classe depuis Pronote. L'outil repère seul les élèves, la colonne « Moyenne » et chaque devoir avec sa date, son barème (/5, /10…), son coefficient et son <b>titre</b>.</li>
+        <li><b>Le titre du devoir</b> sert à reconnaître le chapitre (« Fractions », « Théorème de Pythagore », « DM proportionnalité », « Interro automatismes »…). Vérifiez ou corrigez le chapitre dans le tableau « Évaluations » ci-dessous.</li>
+        <li><b>Captures d'écran</b> : elles marchent aussi, mais Pronote n'y affiche pas les titres des devoirs. Il faudra donc choisir les chapitres à la main.</li>
+        <li>Les lignes en orange sont à vérifier : les notes lues ne redonnent pas la moyenne.</li>
+      </ul>
+    </details>
+    <div class="actions">
+      <span class="sp"></span>
+      <button class="btn" data-act="imp-cancel">Annuler</button>
+      <button class="btn jaune" data-act="imp-go" id="imp-go" disabled>Importer</button>
+    </div>
+  </div>
+</dialog>
+
+<div id="toast"></div>
+
+<script>
+"use strict";
+/* ================= Outils ================= */
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const uid = () => Math.random().toString(36).slice(2, 10);
+const rnd = () => Math.floor(Math.random() * 1e9);
+function rng(seed){ let a = seed >>> 0; return () => { a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+const pick = (arr, r) => arr[Math.floor(r() * arr.length)];
+const genre = (t, f) => t.replace(/\{([^|}]*)\|([^}]*)\}/g, (_, m, w) => f ? w : m);
+const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+const low = s => s.charAt(0).toLowerCase() + s.slice(1);
+const avg = a => a.reduce((x, y) => x + y, 0) / a.length;
+const std = a => { const m = avg(a); return Math.sqrt(avg(a.map(x => (x - m) ** 2))); };
+const num = v => { if (v == null || v === "") return null; const n = parseFloat(String(v).replace(",", ".").trim()); return isNaN(n) ? null : n; };
+const fmt = n => n == null || isNaN(n) ? "–" : n.toFixed(2).replace(".", ",");
+const fmtN = n => String(Math.round(n * 100) / 100).replace(".", ",");
+const listeFr = a => a.length < 2 ? a.join("") : a.slice(0, -1).join(", ") + " et " + a[a.length - 1];
+const couleur = m => m == null || isNaN(m) ? "c0" : m < 8 ? "c1" : m < 10 ? "c2" : m < 12 ? "c3" : m < 14 ? "c4" : "c5";
+const r2 = v => Math.round(v * 100) / 100;
+function toast(msg){ const t = $("#toast"); t.textContent = msg; t.classList.add("on"); clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove("on"), 2200); }
+async function copier(txt){
+  try { await navigator.clipboard.writeText(txt); return true; }
+  catch(e){ const ta = document.createElement("textarea"); ta.value = txt; document.body.appendChild(ta); ta.select(); let ok = false; try { ok = document.execCommand("copy"); } catch(_){} ta.remove(); return ok; }
+}
+const scripts = {};
+function chargerScript(url, test){
+  if (test()) return Promise.resolve();
+  if (!scripts[url]) scripts[url] = new Promise((ok, ko) => { const s = document.createElement("script"); s.src = url; s.onload = ok; s.onerror = () => { delete scripts[url]; ko(new Error("chargement")); }; document.head.appendChild(s); });
+  return scripts[url];
+}
+
+/* ================= Chapitres de mathématiques (repérés dans le titre des devoirs) ================= */
+const DOMAINES = [
+  {id:"pythagore", l:"Pythagore", p:"sur le théorème de Pythagore", n:"le théorème de Pythagore", re:/pythag/i},
+  {id:"thales", l:"Thalès", p:"sur le théorème de Thalès", n:"le théorème de Thalès", re:/thal[eè]s|agrandissement|r[ée]duction de figure/i},
+  {id:"trigo", l:"Trigonométrie", p:"en trigonométrie", n:"la trigonométrie", re:/trigo|cosinus|sinus|tangente/i},
+  {id:"litteral", l:"Calcul littéral", p:"en calcul littéral", n:"le calcul littéral", re:/litt[ée]ral|d[ée]velopp|factoris|identit[ée]s? remarquable|distributivit|expressions? alg[ée]br/i},
+  {id:"equations", l:"Équations", p:"dans la résolution d'équations", n:"la résolution d'équations", re:/[ée]quation/i},
+  {id:"fonctions", l:"Fonctions", p:"sur les fonctions", n:"les fonctions", re:/fonction|affine|lin[ée]aire|ant[ée]c[ée]dent/i},
+  {id:"probas", l:"Probabilités", p:"en probabilités", n:"les probabilités", re:/probabilit|al[ée]atoire/i},
+  {id:"propor", l:"Proportionnalité", p:"en proportionnalité", n:"la proportionnalité", re:/proportion|pourcentage|[ée]chelle|vitesse|ratio/i},
+  {id:"stats", l:"Statistiques", p:"en statistiques", n:"les statistiques", re:/statisti|m[ée]diane|[ée]tendue|donn[ée]es|diagramme|graphique/i},
+  {id:"fractions", l:"Fractions", p:"sur les fractions", n:"les fractions", re:/fraction|quotient/i},
+  {id:"relatifs", l:"Nombres relatifs", p:"sur les nombres relatifs", n:"les nombres relatifs", re:/relatif/i},
+  {id:"puissances", l:"Puissances", p:"sur les puissances", n:"les puissances", re:/puissance|notation scientifique/i},
+  {id:"arithm", l:"Arithmétique", p:"en arithmétique", n:"l'arithmétique", re:/arithm|divisib|diviseur|multiples?\b|nombres? premiers?|pgcd|d[ée]compos|euclid/i},
+  {id:"algo", l:"Algorithmique", p:"en algorithmique", n:"l'algorithmique", re:/algo|scratch|programm/i},
+  {id:"automat", l:"Automatismes", p:"sur les automatismes", n:"les automatismes", re:/automatism|flash|calcul mental|questions? rapides?/i},
+  {id:"espace", l:"Espace et volumes", p:"en géométrie dans l'espace", n:"la géométrie dans l'espace", re:/volume|espace|solide|patron|pav[ée]|cube|cylindre|c[ôo]ne|pyramide|sph[èe]re|perspective/i},
+  {id:"mesures", l:"Aires, périmètres", p:"sur les aires et périmètres", n:"les aires et périmètres", re:/\baires?\b|p[ée]rim[èe]tre|longueur|mesure|conversion|unit[ée]s?\b|dur[ée]e/i},
+  {id:"transfo", l:"Symétries, transformations", p:"sur les symétries et transformations", n:"les symétries et transformations", re:/sym[ée]tr|translation|rotation|homoth[ée]tie|transformation|frise|pavage/i},
+  {id:"decimaux", l:"Nombres décimaux", p:"sur les nombres décimaux", n:"les nombres décimaux", re:/d[ée]cima|nombres? entiers|num[ée]ration|rep[ée]rage|demi-droite gradu|comparer|ranger/i},
+  {id:"geometrie", l:"Géométrie plane", p:"en géométrie", n:"la géométrie", re:/g[ée]om[ée]tr|droite|perpendic|parall[èe]le|cercle|angle|triangle|quadrilat|polygone|construction|m[ée]diatrice|bissectrice|rectangle|losange/i},
+  {id:"calcul", l:"Calcul", p:"en calcul", n:"le calcul", re:/calcul|op[ée]ration|priorit|addition|soustraction|multiplication|division|pos[ée]e/i},
+  {id:"problemes", l:"Problèmes", p:"en résolution de problèmes", n:"la résolution de problèmes", re:/probl[èe]me|t[âa]che complexe/i},
+  {id:"raisonnement", l:"Raisonnement", p:"dans le raisonnement", n:"le raisonnement"},
+  {id:"redaction", l:"Rédaction", p:"dans la rédaction", n:"la rédaction"}
+];
+const DOM = Object.fromEntries(DOMAINES.map(d => [d.id, d]));
+const TYPES = [["ctrl","Contrôle"],["lecon","Interro de leçon / automatismes"],["dm","Devoir maison"],["brevet","Brevet blanc"]];
+const detecterDomaine = t => (DOMAINES.find(d => d.re && d.re.test(t || "")) || {}).id || "";
+function detecterType(t){
+  t = t || "";
+  if (/\bdm\b|devoir (à la )?maison|\bmaison\b/i.test(t)) return "dm";
+  if (/brevet|\bdnb\b/i.test(t)) return "brevet";
+  if (/interro|flash|automatism|calcul mental|le[çc]on|\bqcm\b|questions? rapides?/i.test(t)) return "lecon";
+  return "ctrl";
+}
+
+/* ================= Banque de phrases ================= */
+const RES = {
+  exc:     ["Excellent trimestre.", "Un trimestre remarquable en mathématiques.", "Excellents résultats ce trimestre."],
+  tb:      ["Très bon trimestre.", "Très bons résultats ce trimestre.", "Les résultats sont très satisfaisants."],
+  bien:    ["Bon trimestre.", "Les résultats sont satisfaisants.", "Ensemble satisfaisant ce trimestre."],
+  moyen:   ["Trimestre correct, mais les résultats restent fragiles.", "Les résultats sont justes.", "Les résultats sont corrects mais peuvent progresser."],
+  fragile: ["Trimestre difficile.", "Les résultats sont fragiles.", "Les résultats sont en dessous des attentes."],
+  insuf:   ["Les résultats sont insuffisants.", "Trimestre très difficile en mathématiques.", "Les résultats sont nettement insuffisants."]
+};
+// Ouvertures avec le prénom ({P})
+const RES_P = {
+  exc:     ["{P} réalise un excellent trimestre.", "{P} réalise un trimestre remarquable en mathématiques.", "{P} obtient d'excellents résultats ce trimestre."],
+  tb:      ["{P} réalise un très bon trimestre.", "{P} obtient de très bons résultats ce trimestre."],
+  bien:    ["{P} réalise un bon trimestre.", "{P} obtient des résultats satisfaisants.", "{P} réalise un trimestre satisfaisant."],
+  moyen:   ["{P} réalise un trimestre correct, mais ses résultats restent fragiles.", "{P} obtient des résultats justes.", "{P} obtient des résultats corrects qui peuvent encore progresser."],
+  fragile: ["{P} traverse un trimestre difficile.", "{P} obtient des résultats fragiles.", "Les résultats de {P} sont en dessous des attentes."],
+  insuf:   ["{P} obtient des résultats insuffisants.", "{P} traverse un trimestre très difficile en mathématiques.", "Les résultats de {P} sont nettement insuffisants."]
+};
+const NIV_LABEL = {exc:"Excellent", tb:"Très bien", bien:"Bien", moyen:"Juste", fragile:"Fragile", insuf:"Insuffisant"};
+const TEND = {
+  hausse:      ["les notes sont en nette progression au fil du trimestre.", "on note de réels progrès au fil du trimestre.", "la progression au fil du trimestre est encourageante."],
+  hausse_prev: ["les résultats progressent nettement par rapport au trimestre précédent.", "la progression par rapport au trimestre précédent est réelle."],
+  baisse:      ["Les notes sont en baisse au fil du trimestre.", "Une baisse des résultats est à noter en fin de trimestre."],
+  baisse_prev: ["Les résultats sont en baisse par rapport au trimestre précédent.", "Une baisse est à noter par rapport au trimestre précédent."],
+  irregulier:  ["Les notes sont très irrégulières d'un devoir à l'autre.", "La régularité fait défaut d'un devoir à l'autre."],
+  stable_haut: ["Les résultats se maintiennent à un très bon niveau."]
+};
+const TEND_LABEL = {hausse:"↗ En hausse", baisse:"↘ En baisse", irregulier:"↕ Irrégulier", stable:"→ Stable"};
+
+// sec : "trav" (travail) ou "comp" (comportement) · x = groupe exclusif · p = priorité si le texte est trop long
+const GROUPES = [
+  {id:"particip", titre:"Participation", sec:"comp", tags:[
+    {id:"participe", l:"Participe activement", pos:1, x:"oral", s:["La participation orale est active et pertinente.", "{Il|Elle} participe volontiers et avec pertinence.", "Sa participation enrichit le cours."]},
+    {id:"timide", l:"Timide, réservé", x:"oral", s:["{Il|Elle} doit oser prendre davantage la parole.", "Une participation orale plus fréquente est à encourager.", "{Il|Elle} gagnerait à prendre confiance et à participer davantage à l'oral."]},
+    {id:"particip_insuf", l:"Ne participe pas", x:"oral", s:["La participation orale est insuffisante.", "{Il|Elle} doit s'impliquer davantage à l'oral."]}
+  ]},
+  {id:"classe", titre:"Travail en classe", sec:"trav", tags:[
+    {id:"applique", l:"Appliqué, soigneux", pos:1, s:["Le travail est soigné et {il|elle} se montre {appliqué|appliquée}.", "Le travail en classe est soigné et rigoureux."]},
+    {id:"autonome", l:"Efficace, autonome", pos:1, s:["Le travail en classe est efficace et autonome.", "{Il|Elle} travaille avec efficacité et autonomie."]},
+    {id:"volontaire", l:"Volontaire, fait des efforts", pos:1, s:["{Il|Elle} est volontaire et persévère face aux difficultés.", "{Il|Elle} ne se décourage pas et fournit de réels efforts.", "Les efforts fournis en classe sont réels."]},
+    {id:"lent", l:"Trop lent", s:["Le rythme de travail en classe reste trop lent.", "{Il|Elle} doit gagner en rapidité dans son travail en classe."]},
+    {id:"methode", l:"Méthode à revoir", s:["La méthode de travail doit être plus rigoureuse.", "{Il|Elle} doit soigner davantage la présentation et la rédaction."]},
+    {id:"minimum", l:"Se contente du minimum", s:["{Il|Elle} se contente trop souvent du minimum.", "L'investissement en classe est insuffisant."],
+      sf:["L'investissement en classe est nettement insuffisant : {il|elle} se contente du strict minimum."]}
+  ]},
+  {id:"maison", titre:"Travail à la maison", sec:"trav", tags:[
+    {id:"maison_ok", l:"Régulier, sérieux", pos:1, x:"maison", s:["Le travail personnel est fait avec régularité.", "Les devoirs sont faits avec sérieux.", "Les leçons sont apprises avec sérieux."]},
+    {id:"maison_irreg", l:"Irrégulier", x:"maison", s:["Le travail à la maison est irrégulier.", "Les devoirs ne sont pas toujours faits."]},
+    {id:"maison_non", l:"Insuffisant / non fait", x:"maison", p:7, s:["Le travail personnel est insuffisant.", "Les devoirs sont trop rarement faits."],
+      sf:["Le travail à la maison est inexistant, ce qui n'est pas acceptable."]},
+    {id:"lecons_ok", l:"Leçons bien apprises", pos:1, x:"lec", s:["Les leçons sont apprises avec sérieux.", "Les interrogations de leçon montrent un apprentissage sérieux."]},
+    {id:"lecons", l:"Leçons non apprises", x:"lec", s:["Les leçons doivent être apprises plus régulièrement.", "Un apprentissage régulier des leçons est indispensable.", "Les interrogations de leçon montrent un apprentissage insuffisant."]},
+    {id:"materiel", l:"Oublis de matériel", s:["Les oublis de matériel sont trop fréquents.", "{Il|Elle} doit penser à apporter son matériel."]}
+  ]},
+  {id:"attitude", titre:"Attitude et concentration", sec:"comp", marge:1, tags:[
+    {id:"serieux", l:"Sérieux", pos:1, s:["Élève {sérieux|sérieuse} et {impliqué|impliquée}.", "{Il|Elle} adopte une attitude sérieuse en classe.", "L'attitude en classe est sérieuse et constructive."]},
+    {id:"agreable", l:"Agréable, respectueux", pos:1, s:["{Il|Elle} se montre {respectueux|respectueuse} et agréable en classe.", "Le comportement est agréable et respectueux."]},
+    {id:"exemplaire", l:"Exemplaire", pos:1, p:5, s:["Le comportement est exemplaire.", "L'attitude en classe est irréprochable."]},
+    {id:"concentre", l:"Concentré, attentif", pos:1, x:"conc", s:["{Il|Elle} reste {concentré|concentrée} et {attentif|attentive} en classe.", "L'écoute et l'attention en classe sont de qualité."]},
+    {id:"bavard", l:"Bavard", s:["Les bavardages nuisent à sa concentration.", "Le bavardage est trop fréquent et pénalise son travail.", "{Il|Elle} doit limiter ses bavardages en classe."],
+      sf:["Les bavardages incessants perturbent le cours et doivent cesser.", "Le bavardage permanent n'est pas acceptable et pénalise son travail."]},
+    {id:"distrait", l:"Tête en l'air, distrait", x:"conc", s:["L'attention est trop souvent dispersée.", "{Il|Elle} doit gagner en concentration et en attention.", "Un manque de concentration freine ses progrès."]},
+    {id:"passif", l:"Passif", s:["L'attitude reste trop passive.", "{Il|Elle} doit se montrer plus {actif|active} en classe."]},
+    {id:"dissipe", l:"Dissipé", p:7, s:["L'attitude est trop souvent dissipée.", "Un comportement plus posé est attendu en classe."],
+      sf:["L'attitude dissipée perturbe le cours et doit changer rapidement."]},
+    {id:"insolent", l:"Comportement inadapté", p:8, s:["Le comportement en classe n'est pas acceptable et doit évoluer rapidement.", "L'attitude envers les adultes doit être plus respectueuse."],
+      sf:["Le comportement est inacceptable : un changement immédiat est exigé."]}
+  ]}
+];
+const TAGS = {}, TAG_GRP = {};
+GROUPES.forEach(G => G.tags.forEach(t => { TAGS[t.id] = t; TAG_GRP[t.id] = G; }));
+const CONNECT = {
+  bienveillant: ["Toutefois, ", "Cependant, ", "Attention toutefois : "],
+  neutre: ["Cependant, ", "Toutefois, ", "En revanche, "],
+  ferme: ["Cependant, ", "En revanche, ", "Toutefois, "]
+};
+const CONCL = {
+  felicitations: {tu:["Félicitations, continue ainsi !", "Bravo, continue sur cette voie !", "Excellent travail, continue ainsi !"], neutre:["Félicitations, il faut poursuivre ainsi.", "Un excellent trimestre, à poursuivre."]},
+  continuer: {tu:["Continue ainsi !", "Poursuis tes efforts dans cette voie.", "Continue sur cette lancée !"], neutre:["Il faut poursuivre dans cette voie.", "Ces efforts sont à poursuivre."]},
+  reprendre: {tu:["Reprends ces notions pour progresser encore.", "En retravaillant ces points, tu peux encore progresser.", "Continue tes efforts en revoyant ces notions."], neutre:["Il faut reprendre ces notions pour progresser encore.", "En retravaillant ces points, de nouveaux progrès sont possibles."]},
+  potentiel_comp: {tu:["Plus de concentration en classe te permettrait d'aller encore plus loin.", "Tu as les capacités pour aller plus loin avec une attitude plus posée."], neutre:["Une attitude plus posée permettrait d'aller encore plus loin.", "Les capacités sont là : plus de concentration en classe permettrait de les exploiter pleinement."]},
+  potentiel_impl: {tu:["Davantage d'implication en classe te permettrait d'aller encore plus loin.", "Tu as les capacités pour aller plus loin en t'impliquant davantage."], neutre:["Davantage d'implication en classe permettrait d'aller encore plus loin."]},
+  potentiel_trav: {tu:["Un travail plus régulier te permettrait d'aller encore plus loin.", "Tu as les capacités : mets-les au service d'un travail plus régulier."], neutre:["Un travail plus régulier permettrait d'exploiter pleinement ces capacités.", "Un travail plus régulier permettrait d'aller encore plus loin."]},
+  progres: {tu:["Les progrès sont encourageants, continue !", "C'est sur la bonne voie : persévère !"], neutre:["Les progrès sont encourageants, il faut persévérer.", "C'est sur la bonne voie, il faut continuer."]},
+  perseverer: {tu:["Tes efforts sont réels : persévère, ils finiront par payer.", "Ne te décourage pas et continue tes efforts."], neutre:["Les efforts sont réels, il faut persévérer.", "Il faut persévérer, les efforts finiront par payer."]},
+  travail: {tu:["Un travail régulier à la maison est indispensable pour progresser.", "Un sursaut est attendu au prochain trimestre : tu peux y arriver."], neutre:["Un travail personnel régulier est indispensable pour progresser.", "Un sursaut est attendu au prochain trimestre."]},
+  ferme_comp: {tu:["Un changement d'attitude est impératif dès le prochain trimestre."], neutre:["Un changement d'attitude est impératif dès le prochain trimestre."]},
+  consolider: {tu:["Accroche-toi et reprends les notions fragiles avec régularité.", "Poursuis tes efforts pour consolider tes acquis."], neutre:["Il faut reprendre les notions fragiles avec régularité.", "Des efforts soutenus permettront de consolider les acquis."]},
+  baisse: {tu:["Reste mobilisé pour retrouver ton niveau du début de trimestre.", "Ne relâche pas tes efforts pour retrouver ton meilleur niveau."], neutre:["Il faut rester mobilisé pour retrouver le niveau du début de trimestre.", "Les efforts ne doivent pas se relâcher."]},
+  brevet: {tu:["Le brevet approche : un travail régulier dès maintenant est indispensable."], neutre:["Le brevet approche : un travail régulier dès maintenant est indispensable."]}
+};
+const CL = {
+  ouv: {
+    tb:["Très bon trimestre pour cette classe.", "La classe réalise un très bon trimestre."],
+    bien:["Bon trimestre dans l'ensemble.", "Le bilan de la classe est satisfaisant."],
+    moyen:["Trimestre correct dans l'ensemble, mais des fragilités demeurent.", "Le bilan est mitigé : les résultats sont corrects mais fragiles."],
+    faible:["Trimestre difficile pour la classe.", "Le bilan de la classe est insuffisant ce trimestre."]
+  },
+  ambiance: {
+    agreable:["Le climat de classe est agréable et propice au travail.", "L'ambiance de travail est sereine et agréable."],
+    bavarde:["Les bavardages sont trop nombreux et freinent l'avancée du travail.", "La classe est trop bavarde, ce qui ralentit le rythme des séances."],
+    dissipee:["L'attitude d'une partie de la classe est trop dissipée, ce qui pénalise l'ensemble du groupe.", "Une partie des élèves manque de calme, au détriment de tous."],
+    difficile:["Le comportement de la classe est préoccupant et doit impérativement s'améliorer.", "L'attitude du groupe pose problème et doit changer rapidement."]
+  },
+  particip: {
+    active:["La participation orale est riche et dynamique.", "Les élèves participent volontiers et avec pertinence."],
+    correcte:["La participation est correcte mais repose souvent sur les mêmes élèves.", "La participation orale est correcte, davantage d'élèves pourraient s'exprimer."],
+    timide:["La classe reste assez réservée à l'oral ; davantage d'élèves doivent oser prendre la parole.", "La participation orale est timide et mérite d'être plus soutenue."]
+  },
+  invest: {
+    tres:["Les élèves font preuve d'un bel investissement.", "L'investissement du groupe est remarquable."],
+    bon:["L'investissement est satisfaisant pour la majorité des élèves.", "La plupart des élèves s'investissent sérieusement."],
+    inegal:["L'investissement reste inégal selon les élèves.", "Certains élèves s'investissent pleinement, d'autres beaucoup moins."],
+    insuffisant:["L'investissement d'une partie de la classe est insuffisant.", "Trop d'élèves manquent d'investissement en classe."]
+  },
+  maison: {
+    regulier:["Le travail personnel est sérieux.", "Le travail à la maison est fait avec régularité."],
+    inegal:["Le travail à la maison doit être plus régulier pour beaucoup.", "Le travail personnel reste irrégulier pour une partie des élèves."],
+    insuffisant:["Le travail personnel est nettement insuffisant pour une partie de la classe.", "Trop d'élèves négligent le travail à la maison."]
+  },
+  hetero:["Le niveau est hétérogène : certains élèves obtiennent de très bons résultats tandis que d'autres sont en difficulté.", "Les écarts de niveau sont importants au sein de la classe."],
+  brevet:["La préparation du brevet demande dès maintenant un travail régulier de tous.", "Dans la perspective du brevet, chacun doit s'investir avec régularité."],
+  fin: {
+    pos:["Il faut poursuivre dans cette dynamique.", "Une classe agréable, à encourager dans cette voie."],
+    mix:["Un travail plus régulier permettra à chacun de progresser.", "Des efforts plus soutenus sont attendus au prochain trimestre."],
+    neg:["Un réel sursaut est attendu au prochain trimestre.", "Un changement d'attitude collectif est indispensable."]
+  }
+};
+const CL_OPTS = [
+  {k:"ambiance", t:"Ambiance", o:[["agreable","Agréable"],["bavarde","Bavarde"],["dissipee","Dissipée"],["difficile","Difficile"]]},
+  {k:"particip", t:"Participation", o:[["active","Active"],["correcte","Correcte"],["timide","Timide"]]},
+  {k:"invest", t:"Investissement", o:[["tres","Très bon"],["bon","Bon"],["inegal","Inégal"],["insuffisant","Insuffisant"]]},
+  {k:"maison", t:"Travail à la maison", o:[["regulier","Régulier"],["inegal","Inégal"],["insuffisant","Insuffisant"]]},
+  {k:"hetero", t:"Niveau", o:[["auto","Automatique"],["oui","Hétérogène"],["non","Homogène"]]}
+];
+const MENTIONS = ["—", "Félicitations", "Compliments", "Encouragements", "Mise en garde travail", "Mise en garde comportement"];
+
+/* ================= Prénoms (devinette fille / garçon, toujours modifiable) ================= */
+const MASC = new Set("maxime baptiste jérôme jerome antoine alexandre théophile achille aurèle basile côme come philippe pierre steve mike moussa adama luca lucca ilya nicola joshua andrea élie elie timothée timothee rayane rayan amine yassine sofiane souleymane ousmane anisse idrisse adame imrane aymane hamza mustapha moustapha yahya yahia issa oussama zakaria lassana noah jonah ange jordane gianni mattia kylliane jessy".split(" "));
+const FEM = new Set("inès ines manon lilou maëlys maelys chloé chloe zoé zoe anaïs anais lou margaux nour myriam maryam sarah lily lilly romy alix hajar agnès agnes ashley ambre jade noémie noemie héloïse heloise imane yasmine jasmine cassandre louna maëlle maelle ilyana yasmin mélyne melyne hannah odeliah amel".split(" "));
+function devinerSexe(prenom){
+  const p = (prenom || "").trim().split(/[\s-]/)[0].toLowerCase();
+  if (!p) return "G";
+  if (MASC.has(p)) return "G";
+  if (FEM.has(p)) return "F";
+  return /(a|e|ah)$/.test(p) ? "F" : "G";
+}
+
+/* ================= État & sauvegarde ================= */
+const STORE = "appreciations-maths-v1";
+const CFG_DEF = {ton:"neutre", longueur:"standard", max:500, concl:"tu", prenom:"debut"};
+function charger(){ try { const j = localStorage.getItem(STORE); return j ? JSON.parse(j) : null; } catch(e){ return null; } }
+let S = charger() || {classes:[], cur:null, cfg:{...CFG_DEF}};
+function normaliser(){
+  S.cfg = {...CFG_DEF, ...(S.cfg || {})};
+  if (!S.cfg.v2){ if (S.cfg.max === 300 || S.cfg.max === 400) S.cfg.max = 500; S.cfg.v2 = 1; }
+  (S.classes || []).forEach(c => {
+    c.evals = c.evals || [];
+    c.cl = c.cl || {ambiance:"agreable", particip:"correcte", invest:"bon", maison:"inegal", hetero:"auto", texte:"", verrou:false, seed:rnd()};
+    c.eleves.forEach(e => { e.res = e.res || {}; e.off = e.off || []; e.tags = e.tags || []; e.notes = e.notes || []; e.nr = e.nr || 0; });
+  });
+}
+normaliser();
+// nouveau moteur de rédaction : les appréciations non modifiées à la main sont réécrites
+if (S.moteur !== 2){ (S.classes || []).forEach(c => { c.eleves.forEach(e => { if (!e.verrou) e.texte = ""; }); if (c.cl && !c.cl.verrou) c.cl.texte = ""; }); S.moteur = 2; }
+let saveT;
+function sauver(){ clearTimeout(saveT); saveT = setTimeout(() => { try { localStorage.setItem(STORE, JSON.stringify(S)); } catch(e){ toast("⚠️ Sauvegarde impossible dans ce navigateur"); } }, 200); }
+const classe = () => S.classes.find(c => c.id === S.cur);
+let selId = null, onglet = "eleves";
+
+function nouvelleClasse(nom){
+  const m = String(nom).match(/^\s*([3-6])/);
+  return {id:uid(), nom, niveau: m ? m[1] + "e" : "6e", periode:"T1", evals:[], eleves:[],
+    cl:{ambiance:"agreable", particip:"correcte", invest:"bon", maison:"inegal", hetero:"auto", texte:"", verrou:false, seed:rnd()}};
+}
+function nouvelEleve(nom, prenom){
+  return {id:uid(), nom:nom || "NOM", prenom:prenom || "Prénom", sexe:devinerSexe(prenom), sexeDevine:true,
+    moy:null, notes:[], res:{}, nr:0, prev:null, tags:[], off:[], evol:"auto", remarque:"", texte:"", verrou:false, copie:false, mention:"", seed:rnd()};
+}
+
+/* ================= Analyse des résultats ================= */
+function niveau(m){ if (m == null || isNaN(m)) return null; return m >= 16 ? "exc" : m >= 14 ? "tb" : m >= 12 ? "bien" : m >= 10 ? "moyen" : m >= 8 ? "fragile" : "insuf"; }
+function tendanceAuto(e){
+  if (e.prev != null && e.moy != null){ const d = e.moy - e.prev; if (d >= 1) return {t:"hausse", src:"prev"}; if (d <= -1) return {t:"baisse", src:"prev"}; }
+  const n = e.notes || [], w = e.pds && e.pds.length === n.length ? e.pds : n.map(() => 1);
+  if (n.length >= 3){
+    const h = Math.max(1, Math.floor(n.length / 2));
+    const mp = (vs, ws) => vs.reduce((s, v, i) => s + v * ws[i], 0) / ws.reduce((s, x) => s + x, 0);
+    const a = mp(n.slice(0, h), w.slice(0, h)), b = mp(n.slice(n.length - h), w.slice(n.length - h));
+    if (b - a >= 2.5) return {t:"hausse", src:"notes"};
+    if (b - a <= -2.5) return {t:"baisse", src:"notes"};
+    if (n.length >= 4 && std(n) >= 4) return {t:"irregulier", src:"notes"};
+  }
+  return {t:"stable", src: e.prev != null ? "prev" : "aucune"};
+}
+const tendance = e => e.evol && e.evol !== "auto" ? {t:e.evol, src:"manuel"} : tendanceAuto(e);
+const poids = ev => (ev.coef || 1) * (ev.ech || 20);
+function moyEvals(c){
+  const m = {};
+  c.evals.forEach(ev => { const vs = c.eleves.map(x => x.res[ev.id]).filter(v => v != null); m[ev.id] = vs.length ? avg(vs) : null; });
+  return m;
+}
+// Analyse par chapitre + propositions automatiques tirées des notes
+function analyse(e, c, me){
+  const out = {doms:[], forts:[], diffs:[], sugg:[], raisons:{}};
+  if (!c || !c.evals || !c.evals.length) return out;
+  me = me || moyEvals(c);
+  const G = {};
+  let sw = 0, sv = 0;
+  c.evals.forEach(ev => {
+    const v = e.res[ev.id]; if (v == null) return;
+    const w = poids(ev); sw += w; sv += v * w;
+    const k = ev.dom || "_";
+    const g = G[k] = G[k] || {id:k, sw:0, sv:0, cw:0, cv:0, notes:[]};
+    g.sw += w; g.sv += v * w; g.notes.push({ev, v});
+    if (me[ev.id] != null){ g.cw += w; g.cv += me[ev.id] * w; }
+  });
+  const m = e.moy != null ? e.moy : (sw ? sv / sw : null);
+  out.doms = Object.values(G).map(g => ({id:g.id, md:g.sv / g.sw, cm:g.cw ? g.cv / g.cw : null, notes:g.notes}));
+  if (m == null) return out;
+  const vrais = out.doms.filter(d => d.id !== "_");
+  const forts = vrais.filter(d => d.md >= 14 && (d.md - m >= 1.5 || d.md >= 17)).sort((a, b) => b.md - a.md).slice(0, 2);
+  const diffs = vrais.filter(d => !forts.includes(d) && ((d.md < 10 && (m - d.md >= 1.5 || d.md < 8)) || (d.md < 12 && d.cm != null && d.cm - d.md >= 4))).sort((a, b) => a.md - b.md).slice(0, 2);
+  out.forts = forts.map(d => d.id); out.diffs = diffs.map(d => d.id);
+  forts.forEach(d => out.raisons["f_" + d.id] = `${fmtN(r2(d.md))}/20 sur ce chapitre (moyenne ${fmt(m)})`);
+  diffs.forEach(d => out.raisons["d_" + d.id] = `${fmtN(r2(d.md))}/20 sur ce chapitre (moyenne ${fmt(m)})`);
+  // Interrogations de leçon / automatismes → apprentissage des leçons
+  const lec = c.evals.filter(ev => ev.type === "lecon" && e.res[ev.id] != null);
+  if (lec.length){
+    const ml = lec.reduce((s, ev) => s + e.res[ev.id] * poids(ev), 0) / lec.reduce((s, ev) => s + poids(ev), 0);
+    if (ml < 9 && (m - ml >= 2 || ml < 7)){ out.sugg.push("lecons"); out.raisons.lecons = `interros de leçon : ${fmtN(r2(ml))}/20`; }
+    else if (ml >= 15 && m >= 12){ out.sugg.push("lecons_ok"); out.raisons.lecons_ok = `interros de leçon : ${fmtN(r2(ml))}/20`; }
+  }
+  // Devoirs non rendus
+  // l'apprentissage des leçons est déjà signalé : inutile de répéter « automatismes » en difficulté
+  if (out.sugg.includes("lecons")){ out.diffs = out.diffs.filter(id => id !== "automat"); delete out.raisons.d_automat; }
+  if (e.nr >= 2){ out.sugg.push("maison_non"); out.raisons.maison_non = `${e.nr} devoirs non rendus`; }
+  else if (e.nr === 1){ out.sugg.push("maison_irreg"); out.raisons.maison_irreg = "1 devoir non rendu"; }
+  return out;
+}
+function autoTags(e, c, me){
+  const a = analyse(e, c, me);
+  return {a, set:new Set([...a.forts.map(id => "f_" + id), ...a.diffs.map(id => "d_" + id), ...a.sugg])};
+}
+// Critères retenus = cochés à la main + proposés automatiquement (sauf ceux retirés ou en conflit)
+function effTags(e, c, me){
+  const {set: auto} = autoTags(e, c, me);
+  const s = new Set(e.tags);
+  auto.forEach(id => {
+    if (e.off.includes(id)) return;
+    if (id.startsWith("f_") && s.has("d_" + id.slice(2))) return;
+    if (id.startsWith("d_") && s.has("f_" + id.slice(2))) return;
+    const t = TAGS[id];
+    if (t && t.x && [...s].some(o => TAGS[o] && TAGS[o].x === t.x)) return;
+    s.add(id);
+  });
+  return s;
+}
+
+/* ================= Génération d'une appréciation ================= */
+function conclusion(e, c, niv, td, tags, r, diffs){
+  const st = S.cfg.concl === "neutre" ? "neutre" : "tu";
+  const has = ids => ids.some(i => tags.has(i));
+  const negDe = sec => [...tags].some(i => TAGS[i] && !TAGS[i].pos && !["timide","particip_insuf"].includes(i) && TAG_GRP[i].sec === sec);
+  const negComp = negDe("comp"), negTrav = [...tags].some(i => ["maison_non","maison_irreg","lecons","minimum"].includes(i));
+  const effort = has(["serieux", "volontaire", "maison_ok", "lecons_ok", "applique"]);
+  const grave = has(["insolent", "dissipe"]) || (S.cfg.ton === "ferme" && negComp);
+  let k;
+  if (niv === "exc") k = (!negComp && !negTrav) ? (diffs ? "reprendre" : td.t === "baisse" ? "baisse" : "felicitations") : negComp ? "potentiel_comp" : "potentiel_trav";
+  else if (niv === "tb" || niv === "bien") k = grave ? "ferme_comp" : negComp ? "potentiel_comp" : negTrav ? "potentiel_trav" : diffs ? "reprendre" : td.t === "baisse" ? "baisse" : (td.t === "hausse" && r() < .5 ? "progres" : "continuer");
+  else if (!niv) k = "continuer";
+  else {
+    k = grave ? "ferme_comp" : td.t === "hausse" ? "progres" : negTrav ? "travail" : effort ? "perseverer" : "consolider";
+    if (c && c.niveau === "3e" && (k === "travail" || k === "consolider") && r() < .5) k = "brevet";
+  }
+  if (k === "potentiel_comp" && !has(["bavard","dissipe","insolent"])) k = "potentiel_impl";
+  return CONCL[k][st];
+}
+
+/* Formes grammaticales de chaque critère, pour rédiger des phrases synthétiques */
+const FORMES = {
+  applique:{adj:"{appliqué|appliquée}"}, autonome:{adj:"efficace et {autonome|autonome}"}, volontaire:{adj:"volontaire"},
+  lent:{vp:"gagner en rapidité"}, methode:{vp:"travailler avec plus de méthode et de rigueur"}, minimum:{vp:"s'investir davantage sans se contenter du minimum", fort:1},
+  maison_ok:{clause:"le travail personnel est fait avec régularité", nom:"un travail régulier à la maison"},
+  lecons_ok:{clause:"les leçons sont bien apprises", nom:"des leçons bien apprises"},
+  maison_irreg:{vp:"faire ses devoirs avec plus de régularité"}, maison_non:{vp:"fournir enfin un vrai travail personnel", fort:1},
+  lecons:{vp:"apprendre ses leçons plus sérieusement"}, materiel:{vp:"penser à apporter son matériel"},
+  serieux:{adj:"{sérieux|sérieuse}"}, agreable:{adj:"agréable"}, exemplaire:{adj:"au comportement exemplaire"}, concentre:{adj:"{attentif|attentive}"},
+  participe:{adj:"{investi|investie} à l'oral"},
+  bavard:{np:"les bavardages", pl:1, vp:"limiter ses bavardages", fort:1},
+  distrait:{np:"un manque de concentration", vp:"gagner en concentration"},
+  dissipe:{np:"une attitude dissipée", vp:"adopter une attitude plus posée", fort:1},
+  passif:{np:"une attitude trop passive", vp:"se montrer plus {actif|active}"},
+  timide:{vp:"oser prendre davantage la parole"}, particip_insuf:{vp:"s'impliquer davantage à l'oral"}
+};
+const OUV = {
+  exc:{p:["{P} réalise un excellent trimestre", "{P} signe un trimestre remarquable"], n:["Excellent trimestre", "Un trimestre remarquable"]},
+  tb:{p:["{P} réalise un très bon trimestre", "{P} signe un très bon trimestre"], n:["Très bon trimestre", "Un très bon trimestre"]},
+  bien:{p:["{P} réalise un bon trimestre", "{P} réalise un trimestre satisfaisant"], n:["Bon trimestre", "Trimestre satisfaisant"]},
+  moyen:{p:["{P} réalise un trimestre correct mais encore fragile", "{P} obtient des résultats justes"], n:["Trimestre correct mais encore fragile", "Des résultats justes ce trimestre"]},
+  fragile:{p:["{P} traverse un trimestre difficile", "{P} obtient des résultats fragiles"], n:["Trimestre difficile", "Des résultats fragiles ce trimestre"]},
+  insuf:{p:["{P} traverse un trimestre très difficile", "{P} obtient des résultats insuffisants"], n:["Trimestre très difficile", "Des résultats insuffisants ce trimestre"]}
+};
+const CLAUSE = {
+  bon:{hausse:[", avec des résultats en nette progression au fil des devoirs", ", porté par une belle progression au fil des devoirs"],
+       hausse_prev:[", en nette progression par rapport au trimestre précédent"],
+       baisse:[", même si les notes fléchissent en fin de trimestre"], baisse_prev:[", même si les résultats sont en recul par rapport au trimestre précédent"],
+       irregulier:[", malgré des résultats irréguliers d'un devoir à l'autre"],
+       dernier_haut:[", conclu par un dernier devoir particulièrement réussi"], dernier_bas:[", même si le dernier devoir est en deçà"],
+       regulier:[", avec des résultats d'une belle régularité"]},
+  faible:{hausse:[", avec une progression encourageante au fil des devoirs", ", même si les notes progressent nettement au fil des devoirs"],
+       hausse_prev:[", en progrès par rapport au trimestre précédent"],
+       baisse:[", avec des notes en baisse en fin de trimestre"], baisse_prev:[", en recul par rapport au trimestre précédent"],
+       irregulier:[", avec des résultats très irréguliers"],
+       dernier_haut:[", même si le dernier devoir, plus réussi, est encourageant"], dernier_bas:[", avec un dernier devoir décevant"], regulier:[]}
+};
+// Rassemble les critères de travail et d'attitude retenus, sous forme grammaticale
+function criteres(tags, g, lim){
+  const T = ids => ids.filter(i => tags.has(i));
+  const posC = T(["applique","autonome","volontaire"]).slice(0, lim), posM = T(["maison_ok","lecons_ok"]);
+  const wNeg = T(["maison_non","maison_irreg","lecons","minimum","methode","lent","materiel"]).slice(0, Math.max(2, lim));
+  const aPos = T(["exemplaire","serieux","agreable","concentre"]).slice(0, lim), oral = tags.has("participe");
+  const aNeg = T(["dissipe","bavard","distrait","passif","timide","particip_insuf"]).slice(0, Math.max(2, lim));
+  return {posC, posM, wNeg, aPos, oral, aNeg,
+    adjW: g(listeFr(posC.map(i => FORMES[i].adj))), adjA: g(listeFr(aPos.map(i => FORMES[i].adj))),
+    clauseM: posM.length === 2 ? "le travail personnel est régulier et les leçons sont bien apprises" : posM.length ? FORMES[posM[0]].clause : "",
+    nomsM: listeFr(posM.map(i => FORMES[i].nom)),
+    clauseH: posM.length === 2 ? "le travail est régulier et les leçons sont bien apprises" : tags.has("maison_ok") ? "le travail est fait avec régularité" : "les leçons sont bien apprises"};
+}
+const vpsDe = (l, g) => g(listeFr(l.map(i => FORMES[i].vp)));
+function verbeAtt(aNeg, adv, ferme){
+  const fort = aNeg.some(i => FORMES[i].fort);
+  return fort ? `doit${adv ? " " + adv : ""}${ferme ? " impérativement" : ""}` : `gagnerait${adv ? " " + adv : ""} à`;
+}
+const verbeTrav = (adv, ferme) => `doit${adv ? " " + adv : ""}${ferme ? " impérativement" : ""}`;
+// Rédige travail + attitude en 1 à 3 phrases liées
+function phrasesComportement(tags, g, r, lim, ferme){
+  const k = criteres(tags, g, lim), out = [];
+  const wPos = k.posC.length || k.posM.length, aPos = k.aPos.length || k.oral;
+  const oralTxt = () => pick(["participe volontiers et avec pertinence à l'oral", "enrichit le cours par sa participation"], r);
+  let travFait = false, attFait = false;
+  // A. Qualités (attitude et/ou travail en classe) + attitude à améliorer → une phrase
+  if ((k.posC.length || aPos) && !k.posM.length && !k.wNeg.length && k.aNeg.length){
+    const adjs = [...k.aPos, ...k.posC].slice(0, 3).map(i => g(FORMES[i].adj));
+    let sujet = listeFr(adjs) + (k.posC.length ? " en classe" : "");
+    if (k.oral) sujet = adjs.length ? listeFr(adjs) + g(", {investi|investie} à l'oral") : g("{Investi|Investie} à l'oral");
+    out.push({t:g(`${cap(sujet)}, {il|elle} ${verbeAtt(k.aNeg, "toutefois", ferme)} ${vpsDe(k.aNeg, g)}.`), v:0}); travFait = attFait = true;
+  }
+  // E. Rien de positif, peu de points à améliorer → une seule phrase d'objectifs
+  else if (!wPos && !aPos && k.wNeg.length && k.aNeg.length && k.wNeg.length + k.aNeg.length <= 3 && !(tags.has("maison_non") && tags.has("minimum"))){
+    const fort = ferme || [...k.wNeg, ...k.aNeg].some(i => FORMES[i].fort);
+    out.push({t:g(pick([`Pour progresser, {il|elle} ${fort && ferme ? "doit impérativement" : "doit"} ${vpsDe([...k.wNeg, ...k.aNeg], g)}.`, `{Il|Elle} doit désormais ${vpsDe([...k.wNeg, ...k.aNeg], g)}.`], r)), v:-1}); travFait = attFait = true;
+  }
+  // B. Attitude positive + travail seulement à améliorer → une phrase
+  else if (k.aPos.length && !k.aNeg.length && k.wNeg.length && !wPos){
+    out.push({t:g(`Élève ${k.adjA}${k.oral ? ` qui ${oralTxt()}` : ""}, {il|elle} ${verbeTrav("cependant", ferme)} ${vpsDe(k.wNeg, g)}.`), v:0}); travFait = attFait = true;
+  }
+  // C. Tout est positif → une phrase (deux si beaucoup d'éléments)
+  else if (k.aPos.length && k.posC.length && !k.wNeg.length && !k.aNeg.length){
+    let s = `Élève ${k.adjA}, {il|elle} se montre ${k.adjW} en classe`;
+    if (k.oral) s += / et /.test(k.adjW) ? " et enrichit le cours par sa participation" : ` et ${oralTxt()}`;
+    else if (k.posM.length) s += `, et ${k.clauseM}`;
+    out.push({t:g(s + "."), v:1});
+    if (k.oral && k.posM.length) out.push({t:g(`À la maison, ${k.clauseH}.`), v:1});
+    travFait = attFait = true;
+  }
+  if (!travFait && (wPos || k.wNeg.length)){
+    let s, v;
+    if (!k.wNeg.length){
+      v = 1;
+      if (k.posC.length && k.posM.length) s = pick([`{Il|Elle} se montre ${k.adjW} en classe, et ${k.clauseM}.`, `${cap(k.adjW)} en classe, {il|elle} s'appuie aussi sur ${k.nomsM}.`], r);
+      else if (k.posC.length) s = pick([`{Il|Elle} se montre ${k.adjW} en classe.`, `En classe, {il|elle} se montre ${k.adjW}.`], r);
+      else s = cap(k.clauseM) + ".";
+    } else if (!wPos){
+      v = -1;
+      if (tags.has("maison_non") && tags.has("minimum")){
+        const autres = k.wNeg.filter(i => i !== "maison_non" && i !== "minimum");
+        s = `Le travail est insuffisant, en classe comme à la maison : {il|elle} ${verbeTrav("", ferme)} ${autres.length ? vpsDe(autres, g) : "se remettre au travail sans attendre"}.`;
+      } else s = pick([`Pour progresser, {il|elle} ${verbeTrav("", ferme)} ${vpsDe(k.wNeg, g)}.`, `{Il|Elle} ${verbeTrav("désormais", ferme)} ${vpsDe(k.wNeg, g)}.`], r);
+    } else {
+      v = 0;
+      s = k.posC.length ? `${cap(k.adjW)} en classe, {il|elle} ${verbeTrav("cependant", ferme)} ${vpsDe(k.wNeg, g)}.` : `Si ${k.clauseM}, {il|elle} ${verbeTrav("", ferme)} ${vpsDe(k.wNeg, g)}.`;
+    }
+    out.push({t:g(s), v});
+  }
+  if (!attFait && (aPos || k.aNeg.length)){
+    let s, v;
+    if (!k.aNeg.length){
+      v = 1;
+      s = k.aPos.length ? `Élève ${k.adjA}, {il|elle} ${k.oral ? oralTxt() : pick(["contribue à une ambiance de travail sereine", "travaille dans un excellent état d'esprit"], r)}.` : pick(["{Il|Elle} participe volontiers et avec pertinence à l'oral.", "Sa participation orale, régulière et pertinente, enrichit le cours."], r);
+    } else if (!aPos){
+      v = -1;
+      const nps = k.aNeg.filter(i => FORMES[i].np), seuls = k.aNeg.filter(i => !FORMES[i].np);
+      if (nps.length){
+        const pl = nps.length > 1 || FORMES[nps[0]].pl;
+        s = `${cap(listeFr(nps.map(i => FORMES[i].np)))} ${pick(pl ? ["freinent ses progrès", "pénalisent son travail"] : ["freine ses progrès", "pénalise son travail"], r)}`;
+        if (seuls.length) s += ` et {il|elle} ${verbeAtt(seuls, "", ferme)} ${vpsDe(seuls, g)}`;
+        s += ".";
+      } else s = `{Il|Elle} ${verbeAtt(k.aNeg, "", ferme)} ${vpsDe(k.aNeg, g)}.`;
+    } else {
+      v = 0;
+      const sujet = k.aPos.length ? cap(k.adjA) : "{Impliqué|Impliquée} à l'oral";
+      s = `${sujet}, {il|elle} ${verbeAtt(k.aNeg, "toutefois", ferme)} ${vpsDe(k.aNeg, g)}.`;
+    }
+    out.push({t:g(s), v});
+  }
+  if (tags.has("insolent")) out.push({t:ferme ? "Le comportement est inacceptable : un changement immédiat est exigé." : "Le comportement en classe n'est pas acceptable et doit évoluer rapidement.", v:-1, p:9});
+  return out;
+}
+
+function generer(e, c, me){
+  const cfg = S.cfg, F = e.sexe === "F", g = t => genre(t, F), ferme = cfg.ton === "ferme";
+  const tags = effTags(e, c, me);
+  const a = analyse(e, c, me);
+  const niv = niveau(e.moy), td = tendance(e);
+  const pre = (e.prenom || "").trim().split(/\s+/)[0] || "";
+  const modeP = pre && pre !== "Prénom" ? (cfg.prenom || "non") : "non";
+  const limBase = {courte:1, standard:3, developpee:5}[cfg.longueur] || 3;
+
+  const rediger = lim => {
+    const r = rng(e.seed), it = [];
+    // 1. Ouverture : niveau + évolution (ou détail marquant) dans la même phrase
+    if (niv){
+      const bon = ["exc","tb","bien"].includes(niv);
+      const base = (modeP === "debut" || modeP === "deux") ? pick(OUV[niv].p, r).replace("{P}", pre) : pick(OUV[niv].n, r);
+      let k = null;
+      if (td.t === "hausse") k = td.src === "prev" ? "hausse_prev" : "hausse";
+      else if (td.t === "baisse") k = td.src === "prev" ? "baisse_prev" : "baisse";
+      else if (td.t === "irregulier") k = "irregulier";
+      else {
+        const n = e.notes || [], last = n[n.length - 1];
+        if (n.length >= 3 && e.moy != null){
+          if (last >= Math.max(14, e.moy + 3)) k = "dernier_haut";
+          else if (last <= e.moy - 4) k = "dernier_bas";
+          else if (bon && e.moy >= 14 && std(n) < 1.5) k = "regulier";
+        }
+      }
+      const cl = k && CLAUSE[bon ? "bon" : "faible"][k] || [];
+      it.push({t:base + (cl.length ? pick(cl, r) : "") + ".", p:10, v:bon ? 1 : niv === "moyen" ? 0 : -1, sec:"res"});
+    } else {
+      it.push({t:g(modeP !== "non" ? `${pre} n'a pas pu être {évalué|évaluée} ce trimestre.` : "{Il|Elle} n'a pas pu être {évalué|évaluée} ce trimestre."), p:99, v:0, sec:"res"});
+    }
+    // 2. Chapitres, avec comparaison à la classe quand elle est parlante
+    const forts = DOMAINES.filter(d => tags.has("f_" + d.id)).slice(0, 2), diffs = DOMAINES.filter(d => tags.has("d_" + d.id)).slice(0, 2);
+    const P = l => listeFr(l.map(d => d.p)), N = l => listeFr(l.map(d => d.n));
+    if (forts.length && diffs.length) it.push({t:g(pick([
+        `{Il|Elle} est à l'aise ${P(forts)}, mais doit encore retravailler ${N(diffs)}.`,
+        `Les acquis sont solides ${P(forts)}, plus fragiles ${P(diffs)}.`,
+        `Si {il|elle} réussit bien ${P(forts)}, {il|elle} doit encore consolider ${N(diffs)}.`], r)), p:8, v:0, sec:"math"});
+    else if (forts.length){
+      const d = forts.length === 1 && a.doms.find(x => x.id === forts[0].id);
+      const plus = d && d.cm != null && d.md - d.cm >= 4 ? ", bien au-dessus de la moyenne de la classe" : "";
+      it.push({t:g(pick([`{Il|Elle} se distingue particulièrement ${P(forts)}${plus}.`, `{Il|Elle} est particulièrement à l'aise ${P(forts)}${plus}.`], r)), p:8, v:1, pivot:1, sec:"math"});
+    }
+    else if (diffs.length) it.push({t:g(pick([`Des fragilités demeurent ${P(diffs)}, qu'il faudra reprendre.`, `${cap(N(diffs))} ${diffs.length > 1 || /^les /.test(diffs[0].n) ? "restent" : "reste"} à consolider.`], r)), p:8, v:-1, sec:"math"});
+    // 3. Travail (classe + maison) et attitude, rédigés ensemble
+    phrasesComportement(tags, g, r, lim, ferme).forEach(x => it.push({p:6, pivot:x.v === 1 ? 1 : 0, ...x, sec:"comp"}));
+    if (e.remarque && e.remarque.trim()){ let s = e.remarque.trim(); if (!/[.!?…]$/.test(s)) s += "."; it.push({t:cap(s), p:9, v:0, sec:"rem"}); }
+    // 5. Conclusion
+    if (niv){
+      let cc = g(pick(conclusion(e, c, niv, td, tags, r, diffs.length > 0), r));
+      if ((modeP === "fin" || modeP === "deux") && cfg.concl !== "neutre" && /\b(continue|poursuis|persévère|reste|reprends|accroche-toi|relâche|décourage|retravaillant)\b/i.test(cc))
+        cc = cc.replace(/\s*([!.])\s*$/, (_, ponct) => `, ${pre}${ponct === "!" ? " !" : "."}`);
+      it.push({t:cc, p:99, v:0, sec:"concl"});
+    }
+    return it;
+  };
+  const build = list => {
+    const rr = rng(e.seed + 7), dispo = [...(CONNECT[cfg.ton] || CONNECT.neutre)];
+    let prev = null, dePlus = false, neanmoins = false;
+    const out = list.map(x => {
+      let s = x.t;
+      if (prev){
+        const debutLibre = !/^(Si |S'|Pour |En classe|Toutefois|Cependant)/.test(s);
+        if (x.v === -1 && prev.v === 1 && dispo.length && debutLibre) s = dispo.splice(Math.floor(rr() * dispo.length), 1)[0] + low(s);
+        else if (x.v === -1 && prev.v === -1 && prev.sec !== "res" && !dePlus && debutLibre && rr() < .6){ s = "De plus, " + low(s); dePlus = true; }
+        else if (x.pivot && prev.v === -1 && !neanmoins && debutLibre){ s = "Néanmoins, " + low(s); neanmoins = true; }
+      }
+      prev = x; return s;
+    });
+    let txt = out.join(" ").replace(/\bSi il/g, "S'il").replace(/\bsi il/g, "s'il").replace(/\b([Dd]e|[Qq]ue) ([aeéiou])/g, (m, a, b) => m);
+    if (c && String(c.periode).startsWith("S")) txt = txt.replace(/trimestre/g, "semestre");
+    return txt;
+  };
+  const max = +cfg.max || 0;
+  // trop long : d'abord moins d'adjectifs, puis on retire les phrases les moins importantes
+  let lim = limBase, list = rediger(lim).map((x, i) => ({...x, i})), txt = build(list);
+  while (max && txt.length > max && lim > 1){ lim--; list = rediger(lim).map((x, i) => ({...x, i})); txt = build(list); }
+  while (max && txt.length > max && list.length > 2){
+    let w = null;
+    list.forEach(x => { if (x.sec === "concl") return; if (!w || x.p < w.p || (x.p === w.p && x.i > w.i)) w = x; });
+    if (!w) break;
+    list = list.filter(x => x !== w); txt = build(list);
+  }
+  return txt;
+}
+function maj(e, me){ if (!e.verrou) e.texte = generer(e, classe(), me); sauver(); }
+function majTous(c){ const me = moyEvals(c); c.eleves.forEach(x => { if (!x.verrou) x.texte = generer(x, c, me); }); if (!c.cl.verrou) c.cl.texte = ""; sauver(); }
+
+/* ================= Appréciation de classe ================= */
+function stats(c){
+  const m = c.eleves.map(e => e.moy).filter(v => v != null && !isNaN(v)).sort((a, b) => a - b);
+  if (!m.length) return {n:0, moy:null};
+  return {n:m.length, moy:avg(m), med: m.length % 2 ? m[(m.length - 1) / 2] : (m[m.length / 2 - 1] + m[m.length / 2]) / 2,
+    min:m[0], max:m[m.length - 1], sd:std(m), sup10:m.filter(v => v >= 10).length / m.length,
+    tr:[[0,8],[8,10],[10,12],[12,14],[14,16],[16,21]].map(([a, b]) => m.filter(v => v >= a && v < b).length)};
+}
+function domainesClasse(c){
+  const me = moyEvals(c), G = {};
+  c.evals.forEach(ev => { if (!ev.dom || me[ev.id] == null) return; const g = G[ev.dom] = G[ev.dom] || {id:ev.dom, sw:0, sv:0}; g.sw += poids(ev); g.sv += me[ev.id] * poids(ev); });
+  return Object.values(G).map(g => ({id:g.id, m:g.sv / g.sw})).sort((a, b) => b.m - a.m);
+}
+function genererClasse(c){
+  const cl = c.cl, r = rng(cl.seed), st = stats(c), p = [];
+  let score = 0;
+  // 1. Bilan + chapitres dans la même phrase
+  const dc = domainesClasse(c);
+  let chap = "";
+  if (dc.length >= 2){
+    const b = dc[0], w = dc[dc.length - 1];
+    if (b.m >= 12 && w.m < 11 && b.m - w.m >= 2) chap = pick([`les résultats sont bons ${DOM[b.id].p}, plus fragiles ${DOM[w.id].p}`, `${DOM[b.id].n} ${/^les /.test(DOM[b.id].n) ? "sont bien maîtrisés" : "est bien maîtrisé"}, alors que des difficultés collectives apparaissent ${DOM[w.id].p}`], r);
+    else if (w.m < 10) chap = `des difficultés collectives apparaissent ${DOM[w.id].p}`;
+    else if (b.m >= 14) chap = `les résultats sont particulièrement bons ${DOM[b.id].p}`;
+  }
+  if (st.moy != null){
+    const ouv = st.moy >= 14 ? ["Très bon trimestre pour cette classe", "La classe réalise un très bon trimestre"] : st.moy >= 12 ? ["Bon trimestre dans l'ensemble", "Le bilan de la classe est satisfaisant"] : st.moy >= 10 ? ["Le bilan de la classe est mitigé", "Trimestre correct dans l'ensemble, mais fragile"] : ["Trimestre difficile pour la classe", "Le bilan de la classe est insuffisant ce trimestre"];
+    p.push(pick(ouv, r) + (chap ? " : " + chap : "") + ".");
+    score += st.moy >= 12 ? 1 : st.moy < 10 ? -1 : 0;
+  } else if (chap) p.push(cap(chap) + ".");
+  // 2. Ambiance + participation
+  const AMB = {agreable:["Le climat de classe est agréable", 1], bavarde:["La classe est bavarde", -1], dissipee:["Une partie des élèves manque de calme", -1], difficile:["Le comportement du groupe est préoccupant", -2]};
+  const PAR = {active:["la participation orale est riche et dynamique", 1], correcte:["la participation repose souvent sur les mêmes élèves", 0], timide:["les élèves restent trop réservés à l'oral", -1]};
+  const [ta, va] = AMB[cl.ambiance], [tp, vp] = PAR[cl.particip];
+  p.push(`${ta}${va > 0 && vp > 0 ? " et " : (va * vp < 0 || (va > 0 && vp === 0)) ? ", mais " : ", et "}${tp}.`);
+  score += {agreable:1, bavarde:-1, dissipee:-1, difficile:-2}[cl.ambiance];
+  // 3. Investissement en classe + travail à la maison
+  const INV = {tres:["les élèves s'investissent pleinement en classe", 1], bon:["la plupart des élèves s'investissent sérieusement en classe", 1], inegal:["l'investissement en classe reste inégal", -1], insuffisant:["trop d'élèves manquent d'investissement en classe", -1]};
+  const MAI = {regulier:["le travail personnel est fait avec régularité", 1], inegal:["le travail à la maison reste irrégulier pour beaucoup", -1], insuffisant:["le travail personnel est nettement insuffisant pour une partie de la classe", -1]};
+  const [ti, vi] = INV[cl.invest], [tm, vm] = MAI[cl.maison];
+  if (vi === vm){
+    if (cl.invest === "inegal" && cl.maison === "inegal") p.push("L'investissement reste inégal, en classe comme à la maison.");
+    else if (cl.invest === "insuffisant" && cl.maison === "insuffisant") p.push("Trop d'élèves manquent d'investissement, en classe comme à la maison.");
+    else if (cl.invest === "tres" && cl.maison === "regulier") p.push("Les élèves s'investissent pleinement, en classe comme à la maison.");
+    else p.push(`${cap(ti)}, et ${tm}.`);
+  } else p.push(vi > 0 ? `Si ${ti.replace(/^la /, "la ")}, ${tm}.` : `${cap(ti)}, même si ${tm}.`);
+  score += {tres:1, bon:.5, inegal:-.5, insuffisant:-1}[cl.invest] + {regulier:.5, inegal:-.5, insuffisant:-1}[cl.maison];
+  // 4. Hétérogénéité + brevet, puis conclusion
+  const het = cl.hetero === "auto" ? (st.sd != null && st.sd >= 3 ? "oui" : "non") : cl.hetero;
+  const iHet = p.length;
+  if (het === "oui" && c.niveau === "3e") p.push("Face à un niveau très hétérogène, la préparation du brevet exige dès maintenant un travail régulier de tous.");
+  else if (het === "oui") p.push(pick(CL.hetero, r));
+  else if (c.niveau === "3e") p.push(pick(CL.brevet, r));
+  p.push(pick(score >= 1 ? CL.fin.pos : score > -1.5 ? CL.fin.mix : CL.fin.neg, r));
+  // limite de caractères : on retire d'abord la phrase sur le niveau / brevet, puis celle sur l'ambiance
+  const max = +S.cfg.max || 0;
+  for (const k of [iHet, 1]) if (max && p.join(" ").length > max && p.length > k + 1 && k > 0) p.splice(k, 1);
+  let txt = p.join(" ").replace(/\bSi il/g, "S'il");
+  txt = cap(txt);
+  if (String(c.periode).startsWith("S")) txt = txt.replace(/trimestre/g, "semestre");
+  return txt;
+}
+function mentionAuto(e, c, me){
+  const niv = niveau(e.moy), t = effTags(e, c, me), td = tendance(e).t;
+  const negDe = sec => [...t].some(i => TAGS[i] && !TAGS[i].pos && i !== "timide" && TAG_GRP[i].sec === sec);
+  const negComp = negDe("comp"), negTrav = negDe("trav");
+  const effort = ["serieux","volontaire","maison_ok","applique"].some(i => t.has(i));
+  if (t.has("insolent") || t.has("dissipe")) return "Mise en garde comportement";
+  if ((niv === "fragile" || niv === "insuf") && negTrav) return "Mise en garde travail";
+  if (niv === "exc" && !negComp && !negTrav) return "Félicitations";
+  if ((niv === "tb" || niv === "exc") && !negComp) return "Compliments";
+  if (!negComp && !negTrav && (td === "hausse" || effort) && niv) return "Encouragements";
+  return "—";
+}
+
+/* ================= Rendu ================= */
+function renderAll(){
+  const sel = $("#sel-classe");
+  sel.innerHTML = S.classes.length ? S.classes.map(c => `<option value="${c.id}" ${c.id === S.cur ? "selected" : ""}>${esc(c.nom)} · ${esc(c.periode)}</option>`).join("") : `<option>Aucune classe</option>`;
+  document.querySelectorAll("nav.tabs button").forEach(b => b.classList.toggle("on", b.dataset.tab === onglet));
+  document.querySelectorAll(".tab").forEach(t => t.classList.toggle("on", t.id === "tab-" + onglet));
+  renderOnglet();
+}
+function renderOnglet(){
+  if (onglet === "eleves"){ renderListe(); renderEditeur(); }
+  else if (onglet === "recap") renderRecap();
+  else if (onglet === "classe") renderClasse();
+  else if (onglet === "conseil") renderConseil();
+  else renderReglages();
+}
+function vide(){
+  return `<div class="empty"><h2>Bienvenue !</h2><p>Importez le fichier Excel des notes exporté de Pronote. L'outil repère les chapitres d'après le titre des devoirs et vous propose tout de suite une appréciation pour chaque élève. Vous ajoutez ensuite, si besoin, quelques critères (participation, travail, attitude).</p>
+  <div class="top-actions"><button class="btn rose" data-act="import-open">⬆ Importer les notes</button><button class="btn" data-act="new-class">＋ Créer une classe vide</button><button class="btn" data-act="demo">🎲 Essayer avec une classe fictive</button></div></div>`;
+}
+function renderListe(){
+  const c = classe();
+  $("#eleves-wrap").style.gridTemplateColumns = c ? "" : "1fr";
+  document.querySelector("#eleves-wrap aside").style.display = c ? "" : "none";
+  if (!c) return;
+  const q = $("#filtre").value.toLowerCase();
+  const n = c.eleves.length, nc = c.eleves.filter(e => e.copie).length;
+  $("#prog").textContent = `${nc} / ${n} copiées dans Pronote`;
+  $("#prog-bar").style.width = n ? (nc / n * 100) + "%" : "0";
+  $("#items").innerHTML = c.eleves.filter(e => (e.nom + " " + e.prenom).toLowerCase().includes(q)).map(e =>
+    `<button class="item ${e.id === selId ? "sel" : ""}" data-act="sel" data-id="${e.id}"><span class="dot ${e.copie ? "ok" : (e.tags.length || e.verrou) ? "mid" : ""}"></span><span class="nm">${esc(e.nom)} <b>${esc(e.prenom)}</b></span><span class="moy ${couleur(e.moy)}">${fmt(e.moy)}</span></button>`
+  ).join("") || `<p class="muted" style="padding:8px">Aucun élève.</p>`;
+}
+function chip(id, label, cls, on, auto, raison, act = "tag"){
+  return `<button class="chip ${cls} ${on ? "on" : ""} ${auto ? "auto" : ""}" data-act="${act}" data-v="${id}" ${raison ? `title="Proposé d'après les notes : ${esc(raison)}"` : ""}>${esc(label)}</button>`;
+}
+function renderEditeur(){
+  const c = classe(), ed = $("#editeur");
+  if (!c){ ed.innerHTML = vide(); return; }
+  if (!c.eleves.length){ ed.innerHTML = `<div class="empty"><h2>${esc(c.nom)} est vide</h2><p>Importez le fichier Excel des notes de Pronote, ou ajoutez les élèves un par un.</p><div class="top-actions"><button class="btn rose" data-act="import-open">⬆ Importer les notes</button><button class="btn" data-act="add-eleve">＋ Ajouter un élève</button></div></div>`; return; }
+  let e = c.eleves.find(x => x.id === selId);
+  if (!e){ e = c.eleves[0]; selId = e.id; renderListe(); }
+  const me = moyEvals(c);
+  if (!e.texte && !e.verrou) e.texte = generer(e, c, me);
+  const {a, set: auto} = autoTags(e, c, me);
+  const tags = effTags(e, c, me), niv = niveau(e.moy), td = tendance(e), ta = tendanceAuto(e);
+  const srcTxt = {prev:"vs trimestre préc.", notes:"d'après les notes", aucune:"", manuel:"choisi"}[td.src];
+  const idx = c.eleves.indexOf(e), max = +S.cfg.max || 0, n = e.notes || [];
+  const evaluees = new Set(c.evals.map(ev => ev.dom).filter(Boolean));
+  const domsVus = DOMAINES.filter(d => evaluees.has(d.id) || ["problemes","raisonnement","redaction"].includes(d.id) || tags.has("f_" + d.id) || tags.has("d_" + d.id));
+  const domsAutres = DOMAINES.filter(d => !domsVus.includes(d));
+  const chipsDom = (list, pre, cls) => list.map(d => chip(pre + d.id, d.l, cls, tags.has(pre + d.id), auto.has(pre + d.id), a.raisons[pre + d.id])).join("");
+  const notesHtml = c.evals.length
+    ? c.evals.filter(ev => e.res[ev.id] != null).map(ev => `<span class="note ${couleur(e.res[ev.id])}" title="${esc(ev.titre)}${ev.date ? " · " + esc(ev.date) : ""} · ${fmtN(r2(e.res[ev.id] * (ev.ech || 20) / 20))}/${ev.ech || 20}">${fmtN(r2(e.res[ev.id]))}</span>`).join("")
+    : n.map(v => `<span class="note ${couleur(v)}">${fmtN(v)}</span>`).join("");
+  ed.innerHTML = `
+  <div class="ed-head">
+    <div>
+      <div class="ident">
+        <input data-f="nom" value="${esc(e.nom)}" aria-label="Nom">
+        <input class="pre" data-f="prenom" value="${esc(e.prenom)}" aria-label="Prénom">
+        <span class="seg"><button class="${e.sexe === "F" ? "on" : ""}" data-act="sexe" data-v="F">Fille</button><button class="${e.sexe === "G" ? "on" : ""}" data-act="sexe" data-v="G">Garçon</button></span>
+        ${e.sexeDevine ? `<span class="guess">deviné d'après le prénom, à vérifier</span>` : ""}
+      </div>
+      <div class="badges">
+        <span class="badge moy ${couleur(e.moy)}">Moyenne ${fmt(e.moy)}</span>
+        ${niv ? `<span class="badge">${NIV_LABEL[niv]}</span>` : `<span class="badge">Pas de moyenne</span>`}
+        <span class="badge">${TEND_LABEL[td.t]} ${srcTxt ? `<span class="muted">· ${srcTxt}</span>` : ""}</span>
+        ${e.nr ? `<span class="badge" style="color:var(--orange)">${e.nr} non rendu${e.nr > 1 ? "s" : ""}</span>` : ""}
+        <span class="badge muted">${idx + 1} / ${c.eleves.length}</span>
+      </div>
+      ${notesHtml ? `<div class="notes">${notesHtml}<span class="muted" style="font-size:12px">(sur 20, de la plus ancienne à la plus récente${c.evals.length ? " · survolez pour le titre" : ""})</span></div>` : ""}
+    </div>
+    <div class="chiffres">
+      <label>Moyenne<input data-f="moy" inputmode="decimal" value="${e.moy == null ? "" : fmtN(e.moy)}"></label>
+      <label>Trim. précédent<input data-f="prev" inputmode="decimal" placeholder="—" value="${e.prev == null ? "" : fmtN(e.prev)}"></label>
+      ${c.evals.length ? "" : `<label class="wide">Notes sur 20 (séparées par ;)<input data-f="notes" value="${esc(n.map(fmtN).join(" ; "))}"></label>`}
+    </div>
+  </div>
+  <div class="sortie">
+    <div class="sortie-top"><b>Appréciation proposée</b>
+      <span>${e.verrou ? `<span class="lock">🔒 modifiée à la main, plus mise à jour automatiquement</span> · ` : ""}<span class="count ${max && e.texte.length > max ? "over" : ""}" id="count">${e.texte.length}${max ? " / " + max : ""} caractères</span></span>
+    </div>
+    <textarea id="txt" spellcheck="true">${esc(e.texte)}</textarea>
+    <div class="actions">
+      <button class="btn small" data-act="prev" ${idx === 0 ? "disabled" : ""}>← Précédent</button>
+      <button class="btn small" data-act="regen">↻ Autre formulation</button>
+      ${e.verrou ? `<button class="btn small" data-act="unlock">🔓 Revenir au texte automatique</button>` : ""}
+      <span class="sp"></span>
+      <button class="btn small" data-act="copy">📋 Copier</button>
+      <button class="btn small jaune" data-act="copy-next">📋 Copier et élève suivant →</button>
+    </div>
+    <div class="kbd">Raccourcis : Ctrl+Entrée = copier et passer au suivant · Alt+↓ / Alt+↑ = élève suivant / précédent</div>
+  </div>
+  ${a.doms.some(d => d.id !== "_") ? `<div class="grp full" style="margin-top:16px"><h4>Résultats par chapitre</h4><div class="scroll-x"><table class="mini"><thead><tr><th>Chapitre</th><th>Notes de l'élève</th><th>Élève</th><th>Classe</th><th></th></tr></thead><tbody>
+    ${a.doms.sort((x, y) => y.md - x.md).map(d => `<tr><td><b>${d.id === "_" ? "<span class='muted'>Non classé</span>" : esc(DOM[d.id].l)}</b></td>
+      <td>${d.notes.map(o => `<span class="note ${couleur(o.v)}" title="${esc(o.ev.titre)}">${fmtN(r2(o.v))}</span>`).join(" ")}</td>
+      <td><span class="moy ${couleur(d.md)}">${fmt(d.md)}</span></td><td class="muted">${fmt(d.cm)}</td>
+      <td>${a.forts.includes(d.id) ? `<span class="flag f">point fort</span>` : a.diffs.includes(d.id) ? `<span class="flag d">à retravailler</span>` : ""}</td></tr>`).join("")}
+  </tbody></table></div></div>` : ""}
+  <div class="groupes">
+    <div class="grp full"><h4>Mathématiques : chapitres</h4>
+      <div class="legende">✦ = proposé automatiquement d'après les notes (cliquez pour retirer) · les chapitres viennent du titre des devoirs</div>
+      <h5>À l'aise</h5><div class="chips">${chipsDom(domsVus, "f_", "pos")}</div>
+      <h5>En difficulté</h5><div class="chips">${chipsDom(domsVus, "d_", "neg")}</div>
+      ${domsAutres.length ? `<details><summary>Autres chapitres</summary><h5>À l'aise</h5><div class="chips">${chipsDom(domsAutres, "f_", "pos")}</div><h5>En difficulté</h5><div class="chips">${chipsDom(domsAutres, "d_", "neg")}</div></details>` : ""}
+    </div>
+    <div class="grp"><h4>Évolution des résultats</h4><div class="chips">
+      ${chip("auto", "Automatique (" + TEND_LABEL[ta.t].slice(2).toLowerCase() + ")", "neu", e.evol === "auto", false, "", "evol")}
+      ${chip("hausse", "En hausse", "pos", e.evol === "hausse", false, "", "evol")}${chip("stable", "Stable", "neu", e.evol === "stable", false, "", "evol")}
+      ${chip("baisse", "En baisse", "neg", e.evol === "baisse", false, "", "evol")}${chip("irregulier", "Irrégulier", "neg", e.evol === "irregulier", false, "", "evol")}
+    </div></div>
+    ${GROUPES.map(G => `<div class="grp ${G.marge ? "marge" : ""}"><h4>${G.titre}${G.marge ? ` <span class="muted" style="font:12px Nunito;font-weight:700">· à ajouter si besoin</span>` : ""}</h4><div class="chips">${G.tags.map(t => chip(t.id, t.l, t.pos ? "pos" : "neg", tags.has(t.id), auto.has(t.id), a.raisons[t.id])).join("")}</div></div>`).join("")}
+    <div class="grp full"><h4>Remarque personnelle (ajoutée avant la conclusion)</h4>
+      <input id="remarque" placeholder="Ex. : Très bon exposé sur Pythagore." value="${esc(e.remarque)}">
+    </div>
+  </div>
+  <div class="actions"><span class="sp"></span><button class="btn small danger" data-act="del-eleve">Supprimer l'élève</button></div>`;
+}
+function majCompteur(e){
+  const max = +S.cfg.max || 0, el = $("#count");
+  if (!el) return;
+  el.textContent = `${e.texte.length}${max ? " / " + max : ""} caractères`;
+  el.classList.toggle("over", !!max && e.texte.length > max);
+}
+function renderRecap(){
+  const c = classe(), el = $("#recap");
+  if (!c){ el.innerHTML = vide(); return; }
+  const me = moyEvals(c);
+  c.eleves.forEach(e => { if (!e.texte && !e.verrou) e.texte = generer(e, c, me); });
+  el.innerHTML = `<div class="actions" style="margin:0 0 10px"><h3 style="margin:0;flex:1">Toutes les appréciations de ${esc(c.nom)}</h3>
+    <button class="btn small" data-act="copy-all">📋 Tout copier (avec les noms)</button><button class="btn small" data-act="reset-copie">Décocher tout</button></div>
+    <p class="muted" style="margin-top:0">Relisez d'un coup d'œil, copiez chaque appréciation et collez-la dans Pronote. La case se coche toute seule pour suivre où vous en êtes.</p>
+    ${c.eleves.map(e => `<div class="recap-row"><div><b>${esc(e.nom)}</b> ${esc(e.prenom)}<br><span class="moy ${couleur(e.moy)}">${fmt(e.moy)}</span></div>
+      <div class="recap-txt ${e.texte ? "" : "vide"}">${e.texte ? esc(e.texte) : "Pas encore d'appréciation."}</div>
+      <div class="recap-act"><button class="btn small ${e.copie ? "" : "jaune"}" data-act="recap-copy" data-id="${e.id}">📋 Copier</button>
+      <label class="chk"><input type="checkbox" data-copie="${e.id}" ${e.copie ? "checked" : ""}> Dans Pronote</label>
+      <button class="btn small" data-act="goto" data-id="${e.id}">✏️ Modifier</button></div></div>`).join("") || `<p class="muted">Aucun élève.</p>`}`;
+}
+function renderClasse(){
+  const c = classe(), el = $("#classe");
+  if (!c){ el.innerHTML = vide(); return; }
+  const st = stats(c), cl = c.cl;
+  if (!cl.texte && !cl.verrou) cl.texte = genererClasse(c);
+  const maxTr = st.n ? Math.max(...st.tr, 1) : 1;
+  const cols = ["var(--rouge)","var(--orange)","var(--jaune)","#a6d96a","var(--vert)","var(--bleu)"];
+  const labs = ["< 8","8–10","10–12","12–14","14–16","≥ 16"];
+  const dc = domainesClasse(c);
+  el.innerHTML = `<div class="two"><div>
+    <h3>Résultats de ${esc(c.nom)}</h3>
+    ${st.n ? `<div class="stats">
+      <div class="stat"><b>${fmt(st.moy)}</b><span>Moyenne de classe</span></div>
+      <div class="stat"><b>${fmt(st.med)}</b><span>Médiane</span></div>
+      <div class="stat"><b>${fmt(st.min)} – ${fmt(st.max)}</b><span>Min – Max</span></div>
+      <div class="stat"><b>${Math.round(st.sup10 * 100)} %</b><span>≥ 10 / 20</span></div>
+      <div class="stat"><b>${st.n}</b><span>élèves notés</span></div>
+      <div class="stat"><b>${fmt(st.sd)}</b><span>Écart-type ${st.sd >= 3 ? "(hétérogène)" : "(homogène)"}</span></div>
+    </div>
+    <div class="histo">${st.tr.map((v, i) => `<div>${v}<i style="height:${v / maxTr * 100}%;background:${cols[i]}"></i><small>${labs[i]}</small></div>`).join("")}</div>`
+    : `<p class="muted">Pas encore de moyennes : importez les notes pour voir les statistiques.</p>`}
+    ${dc.length ? `<h3>Moyenne de la classe par chapitre</h3><table class="mini"><tbody>${dc.map(d => `<tr><td>${esc(DOM[d.id].l)}</td><td><span class="moy ${couleur(d.m)}">${fmt(d.m)}</span></td></tr>`).join("")}</tbody></table>` : ""}
+  </div><div>
+    <h3>Profil de la classe</h3>
+    ${CL_OPTS.map(o => `<div class="grp" style="margin-bottom:10px"><h5 style="margin-top:0">${o.t}</h5><div class="chips">${o.o.map(([v, l]) => `<button class="chip neu ${cl[o.k] === v ? "on" : ""}" data-act="cl-opt" data-k="${o.k}" data-v="${v}">${l}</button>`).join("")}</div></div>`).join("")}
+  </div></div>
+  <div class="sortie">
+    <div class="sortie-top"><b>Appréciation générale de la classe</b><span>${cl.verrou ? `<span class="lock">🔒 modifiée à la main</span> · ` : ""}<span class="count" id="cl-count">${cl.texte.length} caractères</span></span></div>
+    <textarea id="cl-txt">${esc(cl.texte)}</textarea>
+    <div class="actions"><button class="btn small" data-act="cl-regen">↻ Autre formulation</button>${cl.verrou ? `<button class="btn small" data-act="cl-unlock">🔓 Revenir au texte automatique</button>` : ""}<span class="sp"></span><button class="btn small jaune" data-act="cl-copy">📋 Copier</button></div>
+  </div>`;
+}
+function libelleTag(t){
+  if (TAGS[t]) return TAGS[t].l;
+  const d = DOM[t.slice(2)]; if (!d) return "";
+  return (t.startsWith("f_") ? "＋ " : "− ") + d.l;
+}
+function renderConseil(){
+  const c = classe(), el = $("#conseil");
+  if (!c){ el.innerHTML = vide(); return; }
+  const st = stats(c), me = moyEvals(c);
+  const props = c.eleves.map(e => e.mention || mentionAuto(e, c, me));
+  const compte = MENTIONS.slice(1).map(m => [m, props.filter(p => p === m).length]).filter(x => x[1]);
+  el.innerHTML = `<div class="print-title">${esc(c.nom)} · ${esc(c.periode)} · Mathématiques · moyenne de classe ${fmt(st.moy)}</div>
+  <div class="actions no-print" style="margin:0 0 10px"><h3 style="margin:0;flex:1">Préparation du conseil de classe</h3><button class="btn small jaune" data-act="print">🖨️ Imprimer</button></div>
+  <p class="muted no-print" style="margin-top:0">Propositions calculées à partir de la moyenne et des critères retenus. Modifiez-les librement : ce sont vos propositions pour les mathématiques, la décision revient au conseil.</p>
+  <div class="resume">${compte.map(([m, n]) => `<span class="badge">${m} : ${n}</span>`).join("") || `<span class="muted">Aucune proposition pour l'instant.</span>`}</div>
+  <div class="scroll-x"><table><thead><tr><th>Élève</th><th>Moy.</th><th>Évolution</th><th>Points relevés</th><th>Proposition</th></tr></thead><tbody>
+  ${c.eleves.map((e, i) => { const td = tendance(e);
+    const pts = [...effTags(e, c, me)].map(libelleTag).filter(Boolean).join(", ");
+    return `<tr><td><b>${esc(e.nom)}</b> ${esc(e.prenom)}</td><td><span class="moy ${couleur(e.moy)}">${fmt(e.moy)}</span></td><td>${TEND_LABEL[td.t]}</td><td style="font-size:13px">${esc(pts) || "<span class='muted'>—</span>"}</td>
+    <td><select data-mention="${e.id}">${MENTIONS.map(m => `<option ${props[i] === m ? "selected" : ""}>${m}</option>`).join("")}</select> ${!e.mention ? `<span class="auto-lbl no-print">auto</span>` : ""}</td></tr>`; }).join("")}
+  </tbody></table></div>`;
+}
+function optionsDom(sel){ return `<option value="">— Non classé —</option>` + DOMAINES.map(d => `<option value="${d.id}" ${sel === d.id ? "selected" : ""}>${esc(d.l)}</option>`).join(""); }
+function optionsType(sel){ return TYPES.map(([v, l]) => `<option value="${v}" ${sel === v ? "selected" : ""}>${l}</option>`).join(""); }
+function tableEvals(evals, pref){
+  return `<div class="scroll-x"><table class="mini ev-table"><thead><tr><th>Date</th><th>Titre du devoir</th><th>Sur</th><th>Coef</th><th>Chapitre</th><th>Type</th></tr></thead><tbody>
+  ${evals.map((ev, k) => `<tr><td>${esc(ev.date || "—")}</td><td><input data-${pref}="${k}" data-k="titre" value="${esc(ev.titre)}"></td>
+    <td><input class="n" data-${pref}="${k}" data-k="ech" value="${ev.ech}"></td><td><input class="n" data-${pref}="${k}" data-k="coef" value="${fmtN(ev.coef)}"></td>
+    <td><select data-${pref}="${k}" data-k="dom">${optionsDom(ev.dom)}</select></td><td><select data-${pref}="${k}" data-k="type">${optionsType(ev.type)}</select></td></tr>`).join("")}
+  </tbody></table></div>`;
+}
+function renderReglages(){
+  const c = classe(), cfg = S.cfg;
+  $("#reglages").innerHTML = `<div class="stack">
+  ${c ? `<div><h3>Évaluations de ${esc(c.nom)}</h3>
+    ${c.evals.length ? `<p class="muted" style="margin-top:0">Le chapitre est deviné d'après le titre du devoir. Corrigez-le ici si besoin : les appréciations non verrouillées se mettent à jour.</p>${tableEvals(c.evals, "ev")}`
+    : `<p class="muted" style="margin-top:0">Aucune évaluation importée. Importez le fichier Excel de Pronote pour profiter de l'analyse par chapitre.</p>`}
+  </div>
+  <div><h3>Classe</h3><div class="form">
+    <label>Nom de la classe<input data-cls="nom" value="${esc(c.nom)}"></label>
+    <label>Niveau<select data-cls="niveau">${["6e","5e","4e","3e"].map(n => `<option ${c.niveau === n ? "selected" : ""}>${n}</option>`).join("")}</select><small>En 3e, des phrases sur le brevet peuvent apparaître.</small></label>
+    <label>Période<select data-cls="periode">${["T1","T2","T3","S1","S2"].map(n => `<option ${c.periode === n ? "selected" : ""}>${n}</option>`).join("")}</select><small>En semestre, « trimestre » devient « semestre ».</small></label>
+  </div></div>` : ""}
+  <div><h3>Style des appréciations</h3><div class="form">
+    <label>Ton<select data-cfg="ton"><option value="bienveillant" ${cfg.ton === "bienveillant" ? "selected" : ""}>Bienveillant</option><option value="neutre" ${cfg.ton === "neutre" ? "selected" : ""}>Neutre</option><option value="ferme" ${cfg.ton === "ferme" ? "selected" : ""}>Ferme</option></select></label>
+    <label>Longueur<select data-cfg="longueur"><option value="courte" ${cfg.longueur === "courte" ? "selected" : ""}>Courte</option><option value="standard" ${cfg.longueur === "standard" ? "selected" : ""}>Standard</option><option value="developpee" ${cfg.longueur === "developpee" ? "selected" : ""}>Développée</option></select></label>
+    <label>Nombre maximum de caractères<input type="number" min="0" step="10" data-cfg="max" value="${cfg.max}"><small>Selon la limite de votre établissement dans Pronote. 0 = pas de limite.</small></label>
+    <label>Prénom de l'élève<select data-cfg="prenom">${[["debut","Au début (« Léa réalise un bon trimestre. »)"],["fin","Dans la conclusion (« Continue ainsi, Léa ! »)"],["deux","Au début et dans la conclusion"],["non","Jamais"]].map(([v, l]) => `<option value="${v}" ${cfg.prenom === v ? "selected" : ""}>${l}</option>`).join("")}</select><small>Seul le premier prénom est repris (« Yannis Samuel » → « Yannis »).</small></label>
+    <label>Conclusion<select data-cfg="concl"><option value="tu" ${cfg.concl === "tu" ? "selected" : ""}>S'adresse à l'élève (« Continue ainsi ! »)</option><option value="neutre" ${cfg.concl === "neutre" ? "selected" : ""}>Neutre (« Il faut poursuivre ainsi. »)</option></select></label>
+  </div><p class="muted">Les appréciations modifiées à la main (🔒) ne sont jamais écrasées par un changement de réglage.</p></div>
+  <div><h3>Sauvegarde</h3>
+    <p class="muted" style="margin-top:0">Les données restent dans ce navigateur. Faites une sauvegarde de temps en temps, ou pour passer d'un ordinateur à l'autre.</p>
+    <div class="actions"><button class="btn" data-act="export">💾 Télécharger une sauvegarde</button><button class="btn" data-act="import-json">📂 Restaurer une sauvegarde</button><input type="file" id="json-file" accept=".json,application/json" hidden>
+    <span class="sp"></span>${c ? `<button class="btn danger" data-act="del-class">Supprimer la classe ${esc(c.nom)}</button>` : ""}</div>
+  </div></div>`;
+}
+
+/* ================= Actions ================= */
+function eleveCourant(){ const c = classe(); return c && c.eleves.find(e => e.id === selId); }
+function aller(delta){ const c = classe(); if (!c) return; const i = c.eleves.findIndex(e => e.id === selId); const n = c.eleves[i + delta]; if (n){ selId = n.id; renderListe(); renderEditeur(); const it = document.querySelector(`.item[data-id="${n.id}"]`); if (it) it.scrollIntoView({block:"nearest"}); } }
+async function copierEleve(e, suivant){
+  if (await copier(e.texte)){ e.copie = true; sauver(); toast(suivant ? "Copié ✓ · élève suivant" : "Copié ✓"); }
+  else toast("Copie impossible, sélectionnez le texte à la main");
+  if (suivant) aller(1); else renderListe();
+}
+function basculerTag(e, c, id){
+  const me = moyEvals(c), {set: auto} = autoTags(e, c, me), on = effTags(e, c, me).has(id);
+  const tags = new Set(e.tags), off = new Set(e.off);
+  if (on){ tags.delete(id); if (auto.has(id)) off.add(id); }
+  else {
+    if (auto.has(id)) off.delete(id); else tags.add(id);
+    const t = TAGS[id], contraire = id.startsWith("f_") ? "d_" + id.slice(2) : id.startsWith("d_") ? "f_" + id.slice(2) : null;
+    const retire = o => { tags.delete(o); if (auto.has(o)) off.add(o); };
+    if (contraire) retire(contraire);
+    if (t && t.x) GROUPES.forEach(G => G.tags.forEach(o => { if (o.x === t.x && o.id !== id) retire(o.id); }));
+  }
+  e.tags = [...tags]; e.off = [...off];
+}
+
+document.addEventListener("click", async ev => {
+  const b = ev.target.closest("[data-act]"); if (!b) return;
+  const act = b.dataset.act, c = classe(), e = eleveCourant();
+  switch (act){
+    case "tab": onglet = b.dataset.tab; renderAll(); break;
+    case "new-class": {
+      const nom = prompt("Nom de la classe (ex. : 6B, 3A) :"); if (!nom || !nom.trim()) return;
+      const nc = nouvelleClasse(nom.trim()); S.classes.push(nc); S.cur = nc.id; selId = null; sauver(); renderAll(); break; }
+    case "demo": demo(); break;
+    case "import-open": ouvrirImport(); break;
+    case "sel": case "goto": selId = b.dataset.id; if (act === "goto"){ onglet = "eleves"; renderAll(); } else { renderListe(); renderEditeur(); } break;
+    case "add-eleve": { if (!c) return; const ne = nouvelEleve("NOM", "Prénom"); c.eleves.push(ne); selId = ne.id; sauver(); renderListe(); renderEditeur(); const i = document.querySelector('#editeur input[data-f="nom"]'); if (i){ i.focus(); i.select(); } break; }
+    case "gen-all": if (!c) return; c.eleves.forEach(x => { if (!x.verrou) x.seed = rnd(); }); majTous(c); renderListe(); renderEditeur(); toast("Nouvelles formulations pour les appréciations non verrouillées"); break;
+    case "tag": if (!e) return; basculerTag(e, c, b.dataset.v); maj(e); renderEditeur(); renderListe(); break;
+    case "evol": if (!e) return; e.evol = b.dataset.v; maj(e); renderEditeur(); break;
+    case "sexe": if (!e) return; e.sexe = b.dataset.v; e.sexeDevine = false; maj(e); renderEditeur(); break;
+    case "regen": if (!e) return; e.seed = rnd(); e.verrou = false; maj(e); renderEditeur(); break;
+    case "unlock": if (!e) return; e.verrou = false; maj(e); renderEditeur(); break;
+    case "prev": aller(-1); break;
+    case "copy": if (e) copierEleve(e, false); break;
+    case "copy-next": if (e) copierEleve(e, true); break;
+    case "del-eleve": if (!e || !confirm(`Supprimer ${e.nom} ${e.prenom} ?`)) return; { const i = c.eleves.indexOf(e); c.eleves.splice(i, 1); selId = (c.eleves[i] || c.eleves[i - 1] || {}).id || null; majTous(c); renderListe(); renderEditeur(); } break;
+    case "recap-copy": { const x = c.eleves.find(y => y.id === b.dataset.id); if (x && await copier(x.texte)){ x.copie = true; sauver(); renderRecap(); toast("Copié ✓"); } break; }
+    case "copy-all": if (await copier(c.eleves.map(x => `${x.nom} ${x.prenom} (${fmt(x.moy)}) : ${x.texte}`).join("\n\n"))) toast("Toutes les appréciations sont copiées"); break;
+    case "reset-copie": c.eleves.forEach(x => x.copie = false); sauver(); renderRecap(); break;
+    case "cl-opt": c.cl[b.dataset.k] = b.dataset.v; if (!c.cl.verrou) c.cl.texte = genererClasse(c); sauver(); renderClasse(); break;
+    case "cl-regen": c.cl.seed = rnd(); c.cl.verrou = false; c.cl.texte = genererClasse(c); sauver(); renderClasse(); break;
+    case "cl-unlock": c.cl.verrou = false; c.cl.texte = genererClasse(c); sauver(); renderClasse(); break;
+    case "cl-copy": if (await copier(c.cl.texte)) toast("Copié ✓"); break;
+    case "print": window.print(); break;
+    case "export": {
+      const blob = new Blob([JSON.stringify(S, null, 1)], {type:"application/json"});
+      const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = `appreciations-sauvegarde-${new Date().toISOString().slice(0, 10)}.json`; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000); break; }
+    case "import-json": $("#json-file").click(); break;
+    case "del-class": if (!c || !confirm(`Supprimer définitivement la classe ${c.nom} et toutes ses appréciations ?`)) return;
+      S.classes = S.classes.filter(x => x !== c); S.cur = (S.classes[0] || {}).id || null; selId = null; sauver(); renderAll(); break;
+    case "imp-cancel": $("#dlg-import").close(); break;
+    case "imp-go": validerImport(); break;
+    case "imp-del": imp.rows.splice(+b.dataset.i, 1); renderApercu(); break;
+  }
+});
+
+function majEval(ev, k, val){
+  if (k === "titre"){ ev.sansTitre = false; const autoAvant = !ev.dom || ev.dom === detecterDomaine(ev.titre); ev.titre = val; if (autoAvant) ev.dom = detecterDomaine(val); if (ev.type === detecterType("") || ev.type === "ctrl") ev.type = detecterType(val); }
+  else if (k === "ech") ev.ech = Math.max(1, num(val) || 20);
+  else if (k === "coef") ev.coef = Math.max(0, num(val) ?? 1);
+  else ev[k] = val;
+}
+document.addEventListener("change", ev => {
+  const t = ev.target, c = classe(), e = eleveCourant();
+  if (t.id === "sel-classe"){ S.cur = t.value; selId = null; sauver(); renderAll(); return; }
+  if (t.dataset.f && e){
+    const f = t.dataset.f;
+    if (f === "nom") e.nom = t.value.trim().toUpperCase() || "NOM";
+    else if (f === "prenom"){ e.prenom = t.value.trim(); if (e.sexeDevine) e.sexe = devinerSexe(e.prenom); }
+    else if (f === "moy") e.moy = num(t.value);
+    else if (f === "prev") e.prev = num(t.value);
+    else if (f === "notes") e.notes = t.value.split(/[;\s]+/).map(num).filter(v => v != null && v >= 0 && v <= 20);
+    majTous(c); renderListe(); renderEditeur(); return;
+  }
+  if (t.dataset.ev != null && c){
+    const evo = c.evals[+t.dataset.ev]; if (!evo) return;
+    // un changement de barème recalcule les notes sur 20
+    if (t.dataset.k === "ech"){ const old = evo.ech; majEval(evo, "ech", t.value); c.eleves.forEach(x => { if (x.res[evo.id] != null) x.res[evo.id] = Math.min(20, r2(x.res[evo.id] * old / evo.ech)); }); recalcNotes(c); }
+    else majEval(evo, t.dataset.k, t.value);
+    majTous(c); renderReglages(); toast("Évaluation mise à jour"); return;
+  }
+  if (t.dataset.iev != null){ const evo = imp.evals[+t.dataset.iev]; if (!evo) return;
+    if (t.dataset.k === "ech"){ const old = evo.ech; majEval(evo, "ech", t.value); imp.rows.forEach(r => { const k = +t.dataset.iev; if (r.vals[k] != null) r.vals[k] = Math.min(20, r2(r.vals[k] * old / evo.ech)); }); }
+    else majEval(evo, t.dataset.k, t.value);
+    renderApercu(); return; }
+  if (t.dataset.ir != null){ const r = imp.rows[+t.dataset.ir]; if (!r) return; const k = t.dataset.k; if (k === "moy") r.moy = num(t.value); else r[k] = t.value.trim(); renderApercu(); return; }
+  if (t.dataset.copie){ const x = c.eleves.find(y => y.id === t.dataset.copie); if (x){ x.copie = t.checked; sauver(); } return; }
+  if (t.dataset.mention){ const me = moyEvals(c), x = c.eleves.find(y => y.id === t.dataset.mention); if (x){ x.mention = t.value === mentionAuto(x, c, me) ? "" : t.value; sauver(); renderConseil(); } return; }
+  if (t.dataset.cfg){ S.cfg[t.dataset.cfg] = t.dataset.cfg === "max" ? Math.max(0, parseInt(t.value) || 0) : t.value; S.classes.forEach(cc => cc.eleves.forEach(x => { if (!x.verrou) x.texte = ""; })); sauver(); toast("Réglage enregistré"); return; }
+  if (t.dataset.cls && c){ c[t.dataset.cls] = t.value.trim() || c[t.dataset.cls]; c.eleves.forEach(x => { if (!x.verrou) x.texte = ""; }); if (!c.cl.verrou) c.cl.texte = ""; sauver(); renderAll(); return; }
+  if (t.id === "imp-classe"){ if (reprendreChapitres()) renderApercu(); return; }
+  if (t.id === "imp-recent"){ if (imp.evals.length && !imp.dates){ inverserImport(); renderApercu(); } return; }
+  if (t.id === "json-file" && t.files[0]){
+    const fr = new FileReader();
+    fr.onload = () => { try { const d = JSON.parse(fr.result); if (!d.classes) throw 0; if (!confirm("Remplacer toutes les données actuelles par cette sauvegarde ?")) return; S = d; normaliser(); selId = null; sauver(); renderAll(); toast("Sauvegarde restaurée"); } catch(_){ alert("Ce fichier n'est pas une sauvegarde valide."); } };
+    fr.readAsText(t.files[0]); t.value = "";
+  }
+});
+function recalcNotes(c){ c.eleves.forEach(x => { const evs = c.evals.filter(ev => x.res[ev.id] != null); x.notes = evs.map(ev => x.res[ev.id]); x.pds = evs.map(poids); }); }
+
+document.addEventListener("input", ev => {
+  const t = ev.target, c = classe(), e = eleveCourant();
+  if (t.id === "txt" && e){ e.texte = t.value; if (!e.verrou){ e.verrou = true; e.copie = false; } majCompteur(e); sauver(); return; }
+  if (t.id === "remarque" && e){ e.remarque = t.value; maj(e); const ta = $("#txt"); if (ta && !e.verrou) ta.value = e.texte; majCompteur(e); return; }
+  if (t.id === "cl-txt" && c){ c.cl.texte = t.value; c.cl.verrou = true; $("#cl-count").textContent = t.value.length + " caractères"; sauver(); return; }
+  if (t.id === "filtre"){ renderListe(); return; }
+  if (t.id === "imp-txt"){ apercuTexte(); return; }
+});
+
+document.addEventListener("keydown", ev => {
+  if (onglet !== "eleves" || $("#dlg-import").open) return;
+  const e = eleveCourant(); if (!e) return;
+  if ((ev.ctrlKey || ev.metaKey) && ev.key === "Enter"){ ev.preventDefault(); copierEleve(e, true); }
+  else if (ev.altKey && ev.key === "ArrowDown"){ ev.preventDefault(); aller(1); }
+  else if (ev.altKey && ev.key === "ArrowUp"){ ev.preventDefault(); aller(-1); }
+});
+
+/* ================= Import : lecture d'un tableau (Excel, CSV ou texte collé) ================= */
+let imp = {evals:[], rows:[], dates:false, source:""};
+function ouvrirImport(){
+  imp = {evals:[], rows:[], dates:false, source:""};
+  $("#imp-txt").value = ""; $("#ocr-status").textContent = ""; renderApercu();
+  $("#imp-classe").innerHTML = S.classes.map(c => `<option value="${c.id}" ${c.id === S.cur ? "selected" : ""}>${esc(c.nom)}</option>`).join("") + `<option value="__new" ${S.classes.length ? "" : "selected"}>➕ Nouvelle classe…</option>`;
+  $("#dlg-import").showModal();
+}
+const pad = n => String(n).padStart(2, "0");
+function cellTxt(v){ if (v == null) return ""; if (v instanceof Date) return `${pad(v.getDate())}/${pad(v.getMonth() + 1)}`; return String(v).replace(/\s+/g, " ").trim(); }
+// Une cellule de note : {v} nombre brut, null (Abs, X, Disp…), undefined (texte) ; nr = non rendu ; sur20 = déjà ramenée sur 20
+function lireCellule(x){
+  if (typeof x === "number") return {v:x};
+  const s = cellTxt(x); if (!s) return {v:undefined, vide:true};
+  if (/^n\.?\s?rdu|non\s*rendu|^n\.?\s?r\.?$/i.test(s)) return {v:null, nr:true};
+  if (/^(x|abs\.?|absent|disp\.?|dispensé|n\.?\s?not\.?|n\.?\s?n\.?|inap\.?|-|—|\*)$/i.test(s)) return {v:null, marque:true};
+  const t = s.replace(/\s/g, "").replace(",", ".");
+  let m = t.match(/^(\d{1,3}(?:\.\d+)?)\/(\d{1,3})$/);
+  if (m && +m[2] > 0) return {v:Math.min(20, +m[1] / +m[2] * 20), sur20:true};
+  if (/^\d{1,3}(\.\d{1,2})?$/.test(t)) return {v:+t};
+  return {v:undefined};
+}
+const estNom = s => /[A-Za-zÀ-ÿ]{2,}/.test(s) && !/\d/.test(s);
+const ligneIgnoree = nom => !/[A-Za-zÀ-ÿ]{2,}/.test(nom) || /^(moy|moyenne|élève|eleve|élèves|nom|prénom|prenom|n\.?r|total|classe|groupe|coef|date|devoir|note)/i.test(nom.trim()) || /\d+\s*élèves/i.test(nom);
+function splitNom(full){
+  const parts = full.replace(/\s+/g, " ").trim().split(" ").filter(Boolean);
+  const nom = [], pre = [];
+  parts.forEach(p => { if (!pre.length && p === p.toUpperCase() && /[A-ZÀ-Ý]/.test(p)) nom.push(p); else pre.push(p); });
+  if (!nom.length && pre.length > 1) nom.push(pre.shift().toUpperCase());
+  if (!pre.length && nom.length > 1) pre.push(nom.pop());
+  return {nom:nom.join(" "), prenom:pre.map(p => p.split("-").map(q => q.charAt(0).toUpperCase() + q.slice(1).toLowerCase()).join("-")).join(" ")};
+}
+// Lit les cases d'en-tête d'une colonne : date, coefficient, barème, titre
+function lireEntete(parts){
+  const meta = {titre:[], date:"", coef:1, ech:20};
+  parts.forEach(p => {
+    let s = p.trim(), m;
+    if (!s) return;
+    if ((m = s.match(/^(\d{1,2})\/(\d{1,2})(?:\/(\d{2,4}))?$/))){ meta.date = s; return; }
+    if ((m = s.match(/^(\d+(?:[.,]\d+)?)?\s*-?\s*\/\s*(\d{1,3})$/))){ if (m[1]) meta.coef = num(m[1]); meta.ech = +m[2]; return; }
+    if ((m = s.match(/^(?:coef(?:ficient)?\.?|x)\s*:?\s*(\d+(?:[.,]\d+)?)$/i))){ meta.coef = num(m[1]); return; }
+    if ((m = s.match(/^(?:sur|not[ée] sur|bar[èe]me)\s*:?\s*(\d{1,3})$/i))){ meta.ech = +m[1]; return; }
+    if (/^\d+(?:[.,]\d+)?$/.test(s) && num(s) <= 10){ meta.coef = num(s); return; }
+    // titre : retire les mentions intégrées (« /20 », « coef 2 », date)
+    s = s.replace(/\(?\s*(?:sur|\/)\s*(\d{1,3})\s*\)?/i, (_, n) => { meta.ech = +n; return " "; })
+         .replace(/\(?\s*coef(?:ficient)?\.?\s*:?\s*(\d+(?:[.,]\d+)?)\s*\)?/i, (_, n) => { meta.coef = num(n); return " "; })
+         .replace(/\b(?:du\s+)?(\d{1,2}\/\d{1,2}(?:\/\d{2,4})?)\b/, (_, d) => { if (!meta.date) meta.date = d; return " "; })
+         .replace(/\s+/g, " ").trim();
+    if (s && !/^(note|devoir|évaluation|evaluation)s?$/i.test(s)) meta.titre.push(s);
+  });
+  meta.titre = meta.titre.join(" · ");
+  return meta;
+}
+function cleDate(d){
+  const m = String(d || "").match(/^(\d{1,2})\/(\d{1,2})(?:\/(\d{2,4}))?$/); if (!m) return null;
+  const j = +m[1], mo = +m[2]; let y = m[3] ? +m[3] : null; if (y && y < 100) y += 2000;
+  return y ? y * 10000 + mo * 100 + j : (mo >= 8 ? 0 : 1) * 10000 + mo * 100 + j + 1e8;
+}
+function parseTableau(aoa){
+  aoa = aoa.map(r => (r || []).map(x => x));
+  const W = Math.max(0, ...aoa.map(r => r.length));
+  const aDesNotes = (r, sauf) => r.some((x, j) => !sauf.includes(j) && lireCellule(x).v !== undefined && !lireCellule(x).vide);
+  // colonne des noms : celle qui contient le plus de noms suivis de notes
+  let nameCol = 0, best = -1;
+  for (let j = 0; j < Math.min(4, W); j++){
+    const n = aoa.filter(r => estNom(cellTxt(r[j])) && !ligneIgnoree(cellTxt(r[j])) && aDesNotes(r, [j])).length;
+    if (n > best){ best = n; nameCol = j; }
+  }
+  const first = aoa.findIndex(r => estNom(cellTxt(r[nameCol])) && !ligneIgnoree(cellTxt(r[nameCol])) && aDesNotes(r, [nameCol, nameCol + 1]));
+  if (first < 0) return {evals:[], rows:[], dates:false};
+  const hRows = aoa.slice(Math.max(0, first - 8), first);
+  const hdr = j => hRows.map(r => cellTxt(r[j])).filter(Boolean);
+  // prénom dans une colonne séparée ?
+  let preCol = -1;
+  if (hdr(nameCol + 1).some(s => /pr[ée]nom/i.test(s)) || aoa.slice(first, first + 10).filter(r => estNom(cellTxt(r[nameCol + 1]))).length >= 5) preCol = nameCol + 1;
+  const eleveRows = aoa.slice(first).filter(r => { const s = cellTxt(r[nameCol]); return estNom(s) && !ligneIgnoree(s); });
+  let moyCol = -1; const cols = [];
+  for (let j = 0; j < W; j++){
+    if (j === nameCol || j === preCol) continue;
+    const h = hdr(j), hs = h.join(" ");
+    if (/moy/i.test(hs) && !/classe|groupe|min|max/i.test(hs)){ if (moyCol < 0) moyCol = j; continue; }
+    if (/rang|appr[ée]ciation|comment|retard|absence|^\s*n\.?\s?r\.?\s*$|nb\.?|total/i.test(hs)) continue;
+    const cells = eleveRows.map(r => lireCellule(r[j]));
+    if (!cells.some(x => typeof x.v === "number")) continue;
+    if (cells.filter(x => x.v === undefined && !x.vide).length > cells.length / 2) continue;
+    cols.push({j, meta:lireEntete(h)});
+  }
+  if (moyCol < 0 && !hRows.length && cols.length > 1) moyCol = cols.shift().j; // texte collé sans en-tête : 1re valeur = moyenne
+  const evals = cols.map((c, k) => ({id:uid(), titre:c.meta.titre, sansTitre:!c.meta.titre, date:c.meta.date, ech:c.meta.ech || 20, coef:c.meta.coef ?? 1}));
+  const rows = eleveRows.map(r => {
+    const full = preCol >= 0 ? cellTxt(r[nameCol]) + " " + cellTxt(r[preCol]) : cellTxt(r[nameCol]);
+    const sp = preCol >= 0 ? {nom:cellTxt(r[nameCol]).toUpperCase(), prenom:splitNom("X " + cellTxt(r[preCol])).prenom} : splitNom(full);
+    let nr = 0;
+    const vals = cols.map((c, k) => { const x = lireCellule(r[c.j]); if (x.nr) nr++; if (typeof x.v !== "number") return null; if (x.sur20) return r2(x.v); const ech = evals[k].ech; if (x.v > ech) return null; return r2(x.v / ech * 20); });
+    const mc = moyCol >= 0 ? lireCellule(r[moyCol]) : null;
+    return {...sp, moy: mc && typeof mc.v === "number" && mc.v <= 20 ? mc.v : null, vals, nr};
+  });
+  return finaliserImport(evals, rows);
+}
+// Classe les devoirs dans l'ordre chronologique, devine chapitre et type, calcule les moyennes manquantes
+function finaliserImport(evals, rows){
+  evals.forEach(ev => { if (!ev.titre) ev.sansTitre = true; ev.dom = ev.sansTitre ? "" : detecterDomaine(ev.titre); ev.type = ev.sansTitre ? (ev.ech <= 5 ? "lecon" : "ctrl") : detecterType(ev.titre); });
+  const keys = evals.map(ev => cleDate(ev.date));
+  const dates = evals.length > 0 && keys.every(k => k != null);
+  let ordre = evals.map((_, k) => k);
+  if (dates) ordre.sort((a, b) => keys[a] - keys[b]);
+  else if ($("#imp-recent").checked) ordre.reverse();
+  const res = {evals:ordre.map(k => evals[k]), rows:rows.map(r => ({...r, vals:ordre.map(k => r.vals[k])})), dates};
+  res.evals.forEach((ev, k) => { if (ev.sansTitre) ev.titre = ev.date ? `Devoir du ${ev.date}` : `Évaluation ${k + 1}`; });
+  res.rows.forEach(r => { if (r.moy == null) r.moy = moyCalc(res.evals, r.vals); });
+  return res;
+}
+function inverserImport(){ imp.evals.reverse(); imp.rows.forEach(r => r.vals.reverse()); }
+function moyCalc(evals, vals){
+  let p = 0, t = 0; vals.forEach((v, k) => { if (v == null) return; p += v / 20 * poids(evals[k]); t += poids(evals[k]); });
+  return t ? r2(p / t * 20) : null;
+}
+// Les notes lues redonnent-elles la moyenne ? (total des points, ou moyenne simple des notes coefficientées)
+function coherent(r){
+  if (r.moy == null || !r.vals.some(v => v != null)) return true;
+  const a = moyCalc(imp.evals, r.vals);
+  let s = 0, n = 0; r.vals.forEach((v, k) => { if (v == null) return; s += v * imp.evals[k].coef; n += imp.evals[k].coef; });
+  return Math.abs(a - r.moy) <= .6 || (n && Math.abs(s / n - r.moy) <= .6);
+}
+function apercuTexte(){
+  const txt = $("#imp-txt").value;
+  const aoa = txt.split(/\r?\n/).filter(l => l.trim()).map(l => {
+    if (l.includes("\t")) return l.split("\t");
+    if (l.includes(";")) return l.split(";");
+    const toks = l.trim().split(/\s+/), nomT = [];
+    while (toks.length && lireCellule(toks[0]).v === undefined) nomT.push(toks.shift());
+    return [nomT.join(" "), ...toks];
+  });
+  imp = {...parseTableau(aoa), source:"texte"};
+  renderApercu();
+}
+function renderApercu(){
+  const el = $("#imp-prev"), go = $("#imp-go");
+  go.disabled = !imp.rows.length;
+  go.textContent = imp.rows.length ? `Importer ${imp.rows.length} élève${imp.rows.length > 1 ? "s" : ""}` : "Importer";
+  if (!imp.rows.length){ el.innerHTML = ""; return; }
+  const nbWarn = imp.rows.filter(r => !coherent(r)).length;
+  el.innerHTML = `<h3>Évaluations (${imp.evals.length})</h3>
+    <p class="muted" style="margin:0 0 6px;font-size:13px">Vérifiez le chapitre de chaque devoir : il sert à repérer les points forts et les difficultés de chaque élève.${imp.dates ? "" : " Pas de dates trouvées : l'ordre suit la case « devoirs les plus récents à gauche »."}</p>
+    ${tableEvals(imp.evals, "iev")}
+    <h3>Élèves (${imp.rows.length})${nbWarn ? ` <span class="warn">· ${nbWarn} ligne${nbWarn > 1 ? "s" : ""} à vérifier</span>` : ""}</h3>
+    <div class="prev-wrap"><table><thead><tr><th>Nom</th><th>Prénom</th><th>Moyenne</th><th>Notes sur 20 (ancienne → récente)</th><th></th><th></th></tr></thead><tbody>
+    ${imp.rows.map((r, i) => { const ok = coherent(r); return `<tr ${ok ? "" : `style="background:#f0954a2e" title="Les notes lues ne redonnent pas la moyenne : vérifiez cette ligne"`}>
+      <td><input data-ir="${i}" data-k="nom" value="${esc(r.nom)}"></td><td><input data-ir="${i}" data-k="prenom" value="${esc(r.prenom)}"></td>
+      <td><input class="n" data-ir="${i}" data-k="moy" value="${r.moy == null ? "" : fmtN(r.moy)}"></td>
+      <td style="font-size:13px">${r.vals.map(v => v == null ? "<span class='muted'>·</span>" : `<span class="note ${couleur(v)}">${fmtN(v)}</span>`).join(" ")}${r.nr ? ` <span class="warn">${r.nr} non rendu${r.nr > 1 ? "s" : ""}</span>` : ""}</td>
+      <td class="x">${ok ? "" : `<span class="warn">⚠ à vérifier</span>`}</td>
+      <td class="x"><button class="btn small danger" data-act="imp-del" data-i="${i}" title="Retirer">✕</button></td></tr>`; }).join("")}
+    </tbody></table></div>`;
+}
+function validerImport(){
+  if (!imp.rows.length) return;
+  let c = S.classes.find(x => x.id === $("#imp-classe").value);
+  if (!c){ const nom = prompt("Nom de la nouvelle classe (ex. : 6B, 3A) :", ""); if (!nom || !nom.trim()) return; c = nouvelleClasse(nom.trim()); S.classes.push(c); }
+  S.cur = c.id;
+  const fusion = $("#imp-fusion").value;
+  const cle = (n, p) => (n + " " + p).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/\s+/g, " ").trim();
+  if (fusion === "remplacer"){
+    if (c.eleves.length && !confirm("Remplacer toute la liste actuelle (critères et appréciations compris) ?")) return;
+    c.eleves = [];
+  }
+  c.evals = imp.evals.map(ev => ({...ev}));
+  const vus = new Set();
+  let ajout = 0, majn = 0;
+  imp.rows.forEach(r => {
+    let e = c.eleves.find(x => cle(x.nom, x.prenom) === cle(r.nom, r.prenom));
+    if (e) majn++; else { e = nouvelEleve((r.nom || "NOM").toUpperCase(), r.prenom); c.eleves.push(e); ajout++; }
+    e.moy = r.moy; e.nr = r.nr || 0; e.res = {};
+    c.evals.forEach((ev, k) => { if (r.vals[k] != null) e.res[ev.id] = r.vals[k]; });
+    vus.add(e);
+  });
+  c.eleves.forEach(e => { if (!vus.has(e)) e.res = {}; });
+  recalcNotes(c);
+  c.eleves.sort((a, b) => cle(a.nom, a.prenom).localeCompare(cle(b.nom, b.prenom), "fr"));
+  majTous(c);
+  selId = c.eleves[0] && c.eleves[0].id;
+  $("#dlg-import").close(); onglet = "eleves"; renderAll();
+  toast(`${ajout} élève(s) ajouté(s)${majn ? `, ${majn} mis à jour` : ""} · appréciations proposées`);
+}
+
+/* ---- Fichier Excel / CSV ---- */
+function decoder(buf){
+  try { return new TextDecoder("utf-8", {fatal:true}).decode(buf); }
+  catch(_){ return new TextDecoder("windows-1252").decode(buf); }
+}
+function lireCSV(text){
+  text = text.replace(/^\uFEFF/, "");
+  const l1 = text.split(/\r?\n/).slice(0, 3).join("\n");
+  const sep = [";", "\t", ","].map(s => [s, l1.split(s).length]).sort((a, b) => b[1] - a[1])[0][0];
+  const rows = []; let row = [], cell = "", q = false;
+  for (let i = 0; i < text.length; i++){
+    const ch = text[i];
+    if (q){ if (ch === '"'){ if (text[i + 1] === '"'){ cell += '"'; i++; } else q = false; } else cell += ch; }
+    else if (ch === '"') q = true;
+    else if (ch === sep){ row.push(cell); cell = ""; }
+    else if (ch === "\n" || ch === "\r"){ if (ch === "\r" && text[i + 1] === "\n") i++; row.push(cell); rows.push(row); row = []; cell = ""; }
+    else cell += ch;
+  }
+  if (cell || row.length){ row.push(cell); rows.push(row); }
+  return rows;
+}
+// Reprend les chapitres déjà choisis pour cette classe (même date, barème, coef, ordre)
+function reprendreChapitres(){
+  const c = S.classes.find(x => x.id === $("#imp-classe").value);
+  if (!c || !c.evals || !c.evals.length || !imp.evals.length) return 0;
+  const cle = (ev, n) => `${ev.date}|${ev.ech}|${ev.coef}|${n}`, occ = {}, anc = {};
+  c.evals.forEach(ev => { const b = `${ev.date}|${ev.ech}|${ev.coef}`; occ[b] = (occ[b] || 0) + 1; anc[cle(ev, occ[b])] = ev; });
+  const occ2 = {}; let n = 0;
+  imp.evals.forEach(ev => { const b = `${ev.date}|${ev.ech}|${ev.coef}`; occ2[b] = (occ2[b] || 0) + 1; const a = anc[cle(ev, occ2[b])];
+    if (a && ev.sansTitre){ ev.titre = a.titre; ev.sansTitre = a.sansTitre; ev.dom = a.dom; ev.type = a.type; n++; } });
+  return n;
+}
+async function lireTableur(file){
+  const st = $("#ocr-status");
+  if (/\.csv$/i.test(file.name) || /csv|text\/plain/i.test(file.type)){
+    imp = {...parseTableau(lireCSV(decoder(await file.arrayBuffer()))), source:"fichier"};
+    const repris = reprendreChapitres();
+    renderApercu();
+    const sansTitre = imp.evals.length && imp.evals.every(ev => ev.sansTitre);
+    st.textContent = !imp.rows.length ? "⚠️ Aucun élève trouvé dans ce fichier."
+      : `✅ ${imp.rows.length} élèves et ${imp.evals.length} évaluations trouvés.` + (repris ? ` Chapitres repris de l'import précédent pour ${repris} évaluation(s).` : "")
+        + (sansTitre && !repris ? " Ce fichier ne contient pas le titre des devoirs : indiquez le chapitre de chaque évaluation ci-dessous (ou tapez son titre), il sera retenu pour les prochains imports." : " Vérifiez les chapitres puis importez.");
+    return;
+  }
+  try {
+    st.textContent = "⏳ Lecture du fichier…";
+    await chargerScript("https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js", () => window.XLSX);
+    const buf = await file.arrayBuffer();
+    let wb = XLSX.read(buf, {cellDates:true});
+    let bestRes = null;
+    wb.SheetNames.forEach(n => {
+      const aoa = XLSX.utils.sheet_to_json(wb.Sheets[n], {header:1, raw:true, defval:""});
+      const res = parseTableau(aoa);
+      if (!bestRes || res.rows.length > bestRes.rows.length) bestRes = res;
+    });
+    imp = {...bestRes, source:"fichier"};
+    reprendreChapitres();
+    renderApercu();
+    st.textContent = imp.rows.length ? `✅ ${imp.rows.length} élèves et ${imp.evals.length} évaluations trouvés. Vérifiez les chapitres puis importez.` : "⚠️ Aucun élève trouvé dans ce fichier. Envoyez-moi un exemple pour que j'adapte la lecture.";
+  } catch(err){
+    console.error(err);
+    st.textContent = "⚠️ Impossible de lire ce fichier (une connexion Internet est nécessaire la première fois).";
+  }
+}
+
+/* ---- Captures d'écran (lecture automatique dans le navigateur) ---- */
+function chargerImage(file){ return new Promise((ok, ko) => { const img = new Image(); img.onload = () => ok(img); img.onerror = ko; img.src = URL.createObjectURL(file); }); }
+function preparerCanvas(img){
+  const k = Math.max(1, Math.min(3, 2400 / img.width));
+  const cv = document.createElement("canvas"); cv.width = Math.round(img.width * k); cv.height = Math.round(img.height * k);
+  const ctx = cv.getContext("2d"); ctx.imageSmoothingQuality = "high"; ctx.drawImage(img, 0, 0, cv.width, cv.height);
+  const d = ctx.getImageData(0, 0, cv.width, cv.height), p = d.data;
+  for (let i = 0; i < p.length; i += 4){ const g = .299 * p[i] + .587 * p[i + 1] + .114 * p[i + 2]; const v = g > 185 ? 255 : g < 110 ? 0 : g; p[i] = p[i + 1] = p[i + 2] = v; }
+  ctx.putImageData(d, 0, 0);
+  return cv;
+}
+function valeurOCR(txt){
+  let s = txt.trim();
+  if (/^[xX×]$/.test(s)) return null;
+  if (/^(abs|disp|n\.?not|inap)/i.test(s)) return null;
+  if (!/^[\dOoIl|,.]+$/.test(s) || !/\d/.test(s)) return undefined;
+  s = s.replace(/[Oo]/g, "0").replace(/[Il|]/g, "1").replace(",", ".");
+  const lire = q => {
+    let m = q.match(/^(\d{1,2})\.(\d{1,2})$/); if (m) return +(m[1] + "." + m[2]);
+    m = q.match(/^(\d{1,2})(\d{2})$/); if (m) return +(m[1] + "." + m[2]);
+    m = q.match(/^\d{1,2}$/); if (m) return +q;
+    return undefined;
+  };
+  let v = lire(s);
+  if (v !== undefined && v > 20 && /^7/.test(s)) v = lire("1" + s.slice(1)); // confusion fréquente 1 ↔ 7
+  return v !== undefined && v <= 20 ? v : undefined;
+}
+const motOCR = (w, dx = 0, dy = 0) => ({t:w.text.trim(), x0:w.bbox.x0 + dx, x1:w.bbox.x1 + dx, y0:w.bbox.y0 + dy, y1:w.bbox.y1 + dy, cx:(w.bbox.x0 + w.bbox.x1) / 2 + dx, cy:(w.bbox.y0 + w.bbox.y1) / 2 + dy, h:w.bbox.y1 - w.bbox.y0});
+// words : lecture complète (noms, en-têtes) · numWords : 2e lecture « chiffres seulement », plus fiable pour les notes
+function analyserOCR(words, W, numWords, cropX){
+  words = words.filter(w => (w.t || w.text || "").trim()).map(w => w.t ? w : motOCR(w));
+  if (numWords && numWords.length){
+    words = words.filter(w => !(w.cx > cropX && valeurOCR(w.t) !== undefined)).concat(numWords.filter(w => (w.t || w.text || "").trim()).map(w => w.t ? w : motOCR(w)).filter(w => valeurOCR(w.t) !== undefined));
+  }
+  if (!words.length) return {cols:[], rows:[]};
+  words.sort((a, b) => a.cy - b.cy);
+  const hMoy = avg(words.map(w => w.h)) || 20, lignes = [];
+  words.forEach(w => { const L = lignes[lignes.length - 1]; if (L && Math.abs(w.cy - L.cy) < hMoy * .7){ L.w.push(w); L.cy = avg(L.w.map(z => z.cy)); } else lignes.push({cy:w.cy, w:[w]}); });
+  lignes.forEach(L => L.w.sort((a, b) => a.x0 - b.x0));
+  const entete = lignes.find(L => L.w.some(w => /moyenne/i.test(w.t)));
+  const motMoy = entete && entete.w.find(w => /moyenne/i.test(w.t));
+  const pts = [];
+  lignes.forEach(L => { if (L === entete) return; L.w.forEach(w => { if (valeurOCR(w.t) !== undefined) pts.push(w.x1); }); });
+  if (!pts.length) return {cols:[], rows:[]};
+  pts.sort((a, b) => a - b);
+  const gap = W * .03, cols = [];
+  pts.forEach(x => { const C = cols[cols.length - 1]; if (C && x - C.max < gap){ C.xs.push(x); C.max = x; } else cols.push({xs:[x], max:x}); });
+  cols.forEach(C => { C.x = avg(C.xs); C.ech = 20; });
+  const valides = cols.filter(C => C.xs.length >= 2 || cols.length < 3);
+  const proche = x => valides.reduce((b, C) => Math.abs(C.x - x) < Math.abs(b.x - x) ? C : b, valides[0]);
+  let colMoy = valides[0];
+  if (motMoy) colMoy = proche(motMoy.x1);
+  if (entete) entete.w.forEach(w => { const m = w.t.match(/\/\s*(\d{1,3})$/); if (m && +m[1] > 0 && +m[1] !== 20 && w.cx > (motMoy ? motMoy.x1 : 0)){ const C = proche(w.x1); if (C !== colMoy) C.ech = +m[1]; } });
+  const limiteNom = Math.min(...colMoy.xs) - (motMoy ? (motMoy.x1 - motMoy.x0) * 1.2 : W * .08);
+  const ordre = [...valides].sort((a, b) => a.x - b.x).filter(C => C !== colMoy);
+  const rows = [];
+  lignes.forEach(L => {
+    if (L === entete) return;
+    const nom = L.w.filter(w => w.x1 < limiteNom && valeurOCR(w.t) === undefined && /[A-Za-zÀ-ÿ]/.test(w.t)).map(w => w.t).join(" ").replace(/[^A-Za-zÀ-ÿ' \-]/g, "").trim();
+    if (!nom || ligneIgnoree(nom)) return;
+    let moy = null; const parCol = new Map();
+    L.w.forEach(w => { if (w.x1 < limiteNom) return; const v = valeurOCR(w.t); if (v === undefined || v === null) return; const C = proche(w.x1); if (C === colMoy) moy = v; else if (v <= C.ech) parCol.set(C, r2(v / C.ech * 20)); });
+    rows.push({...splitNom(nom), moy, vals:ordre.map(C => parCol.has(C) ? parCol.get(C) : null), nr:0});
+  });
+  return {cols:ordre.map(C => ({ech:C.ech})), rows};
+}
+async function lireCaptures(files){
+  const st = $("#ocr-status");
+  try {
+    st.textContent = "⏳ Chargement de la lecture automatique (la première fois, quelques secondes)…";
+    await chargerScript("https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js", () => window.Tesseract);
+    const worker = await Tesseract.createWorker("fra");
+    let total = 0;
+    for (let i = 0; i < files.length; i++){
+      st.textContent = `🔎 Lecture de la capture ${i + 1} / ${files.length}…`;
+      const cv = preparerCanvas(await chargerImage(files[i]));
+      await worker.setParameters({tessedit_char_whitelist:"", tessedit_pageseg_mode:"3"});
+      const mots = (await worker.recognize(cv)).data.words || [];
+      const motMoy = mots.find(w => /moyenne/i.test(w.text || ""));
+      let num2 = null, cropX = 0;
+      if (motMoy){
+        cropX = Math.max(0, Math.round(motMoy.bbox.x0 - (motMoy.bbox.x1 - motMoy.bbox.x0) * .3));
+        const cc = document.createElement("canvas"); cc.width = cv.width - cropX; cc.height = cv.height;
+        cc.getContext("2d").drawImage(cv, cropX, 0, cc.width, cc.height, 0, 0, cc.width, cc.height);
+        st.textContent = `🔎 Lecture des notes de la capture ${i + 1} / ${files.length}…`;
+        await worker.setParameters({tessedit_char_whitelist:"0123456789,X/", tessedit_pageseg_mode:"6"});
+        num2 = ((await worker.recognize(cc)).data.words || []).map(w => motOCR(w, cropX, 0));
+      }
+      const res = analyserOCR(mots, cv.width, num2, cropX);
+      const evals = res.cols.map(C => ({id:uid(), titre:"", sansTitre:true, date:"", ech:C.ech, coef:1}));
+      const lu = finaliserImport(evals, res.rows);
+      if (!imp.rows.length || imp.evals.length !== lu.evals.length){ if (!imp.rows.length) imp = {...lu, source:"capture"}; }
+      else lu.rows.forEach(r => { if (!imp.rows.some(x => (x.nom + x.prenom).toLowerCase() === (r.nom + r.prenom).toLowerCase())) imp.rows.push(r); });
+      total = imp.rows.length;
+      renderApercu();
+    }
+    await worker.terminate();
+    st.textContent = total ? `✅ ${total} élève(s) lu(s). Les captures ne montrent pas les titres des devoirs : indiquez le chapitre de chaque évaluation, vérifiez les noms puis importez.` : "⚠️ Aucun élève reconnu. Essayez une capture plus nette, avec la ligne d'en-tête « Moyenne ».";
+  } catch(err){
+    console.error(err);
+    st.textContent = "⚠️ La lecture automatique n'a pas pu démarrer (connexion Internet nécessaire la première fois). Utilisez plutôt le fichier Excel.";
+  }
+}
+function fichiersDeposes(files){
+  files = [...files];
+  const tab = files.find(f => /\.(xlsx|xlsm|xls|ods|csv)$/i.test(f.name) || /sheet|excel|csv/i.test(f.type));
+  if (tab) return lireTableur(tab);
+  const imgs = files.filter(f => f.type.startsWith("image/"));
+  if (imgs.length) return lireCaptures(imgs);
+  $("#ocr-status").textContent = "⚠️ Format non reconnu : utilisez un fichier Excel (.xlsx), .csv ou une capture d'écran.";
+}
+const drop = $("#drop");
+drop.addEventListener("click", () => $("#imp-file").click());
+$("#imp-file").addEventListener("change", ev => { fichiersDeposes(ev.target.files); ev.target.value = ""; });
+["dragenter","dragover"].forEach(t => drop.addEventListener(t, ev => { ev.preventDefault(); drop.classList.add("hover"); }));
+["dragleave","drop"].forEach(t => drop.addEventListener(t, ev => { ev.preventDefault(); drop.classList.remove("hover"); }));
+drop.addEventListener("drop", ev => fichiersDeposes(ev.dataTransfer.files));
+document.addEventListener("paste", ev => {
+  if (!$("#dlg-import").open) return;
+  const imgs = [...((ev.clipboardData || {}).items || [])].filter(i => i.type.startsWith("image/")).map(i => i.getAsFile());
+  if (imgs.length){ ev.preventDefault(); lireCaptures(imgs); }
+});
+
+/* ================= Classe fictive ================= */
+function demo(){
+  const c = nouvelleClasse("6e Démo");
+  const metas = [["Nombres décimaux","12/09",20,1],["Interro automatismes - calcul mental","19/09",10,.5],["Géométrie : droites et cercles","03/10",20,1],["DM Proportionnalité","08/10",20,.5],["Fractions","17/10",20,1]];
+  const evals = metas.map(([titre, date, ech, coef]) => ({id:uid(), titre, date, ech, coef}));
+  const L = [
+    ["MARTIN","Léa",[16,9,17,18,15],["participe"]],
+    ["BERNARD","Lucas",[11,3,12,"N.Rdu",6],["bavard"]],
+    ["THOMAS","Inès",[8,6,11,14,15],["timide"]],
+    ["PETIT","Hugo",[18,10,18.5,19,17],[]],
+    ["ROBERT","Manon",[7,2,9,"N.Rdu",5],[]],
+    ["RICHARD","Nathan",[14,8,9,15,13],["dissipe"]],
+    ["DURAND","Chloé",[12,7,15,13,8],[]],
+    ["DUBOIS","Yanis",[13,9,16,12,14],["serieux"]]
+  ];
+  const rows = L.map(([nom, prenom, notes]) => ({nom, prenom, moy:null, nr:notes.filter(v => typeof v !== "number").length, vals:notes.map((v, k) => typeof v === "number" ? r2(v / evals[k].ech * 20) : null)}));
+  const chk = $("#imp-recent").checked; $("#imp-recent").checked = false;
+  const res = finaliserImport(evals, rows); $("#imp-recent").checked = chk;
+  c.evals = res.evals;
+  c.eleves = res.rows.map((r, i) => { const e = nouvelEleve(r.nom, r.prenom); e.sexeDevine = false; e.moy = r.moy; e.nr = r.nr; c.evals.forEach((ev, k) => { if (r.vals[k] != null) e.res[ev.id] = r.vals[k]; }); e.tags = L[i][3]; return e; });
+  recalcNotes(c);
+  S.classes.push(c); S.cur = c.id; majTous(c); selId = c.eleves[0].id; renderAll(); toast("Classe fictive créée");
+}
+
+/* ================= Démarrage ================= */
+if (!S.cur && S.classes.length) S.cur = S.classes[0].id;
+renderAll();
+</script>
+</body>
+</html>
